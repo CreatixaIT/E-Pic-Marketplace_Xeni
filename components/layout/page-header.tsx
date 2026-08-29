@@ -14,7 +14,7 @@ export function PageHeader({
   children?: ReactNode;
 }) {
   return (
-    <div className="relative overflow-hidden border-b border-white/5">
+    <div className="relative overflow-hidden border-b border-border">
       <div
         aria-hidden
         className="absolute inset-x-0 -top-40 h-80 bg-[radial-gradient(ellipse_at_center,var(--color-accent)/18%,transparent_65%)]"

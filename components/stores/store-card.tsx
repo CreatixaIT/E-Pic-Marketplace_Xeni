@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 
 export function StoreCard({ store }: { store: Store }) {
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-surface transition-colors hover:border-white/25">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-surface transition-colors hover:border-foreground/30">
       <div
         role="img"
         aria-label={store.cover.alt}
@@ -29,7 +29,7 @@ export function StoreCard({ store }: { store: Store }) {
           {store.description}
         </p>
 
-        <dl className="mt-6 flex items-center gap-5 border-t border-white/5 pt-5 text-xs text-muted">
+        <dl className="mt-6 flex items-center gap-5 border-t border-border pt-5 text-xs text-muted">
           <div className="flex items-center gap-1.5">
             <MapPin className="size-3.5" aria-hidden />
             <dt className="sr-only">Location</dt>

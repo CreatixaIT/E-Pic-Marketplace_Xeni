@@ -44,7 +44,7 @@ export default function AboutPage() {
           {principles.map((principle, index) => (
             <li key={principle.title}>
               <Reveal delay={index * 0.07} className="h-full">
-                <article className="h-full rounded-2xl border border-white/10 bg-surface p-7">
+                <article className="h-full rounded-2xl border border-border bg-surface p-7">
                   <h3 className="text-lg font-medium">{principle.title}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted">
                     {principle.body}
@@ -56,7 +56,7 @@ export default function AboutPage() {
         </ul>
       </Section>
 
-      <Section className="border-t border-white/5 bg-surface/40">
+      <Section className="border-t border-border bg-surface/40">
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <SectionHeading
             eyebrow="Status"
@@ -68,7 +68,7 @@ export default function AboutPage() {
               Explore stores
             </ButtonLink>
             <ButtonLink href="/seller" size="lg" variant="secondary">
-              Become a seller
+              Open Your Store
             </ButtonLink>
           </div>
         </div>

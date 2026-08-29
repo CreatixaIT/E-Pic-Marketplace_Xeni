@@ -7,25 +7,43 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu, ShoppingBag, X } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/layout/logo";
+import { LanguageSelector } from "@/components/preferences/language-selector";
+import { ThemeSelector } from "@/components/preferences/theme-selector";
+import type { ActiveLocale } from "@/config/i18n";
+import type { ThemeId } from "@/config/themes";
 import { mainNav } from "@/config/site";
+import { interpolate } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/types";
 import { cn } from "@/lib/utils";
 
-export function SiteHeader({ cartCount }: { cartCount: number }) {
+export function SiteHeader({
+  cartCount,
+  nav,
+  preferences,
+  theme,
+  locale,
+}: {
+  cartCount: number;
+  nav: Dictionary["nav"];
+  preferences: Dictionary["preferences"];
+  theme: ThemeId;
+  locale: ActiveLocale;
+}) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/5 bg-background/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
       <Container>
         <nav
           aria-label="Main"
           className="flex h-16 items-center justify-between gap-6"
         >
-          <Logo />
+          <Logo label={nav.home} />
 
           <ul className="hidden items-center gap-8 md:flex">
             {mainNav.map((link) => (
-              <li key={link.label}>
+              <li key={link.labelKey}>
                 <Link
                   href={link.href}
                   className={cn(
@@ -33,21 +51,24 @@ export function SiteHeader({ cartCount }: { cartCount: number }) {
                     pathname === link.href ? "text-foreground" : "text-muted",
                   )}
                 >
-                  {link.label}
+                  {nav[link.labelKey]}
                 </Link>
               </li>
             ))}
           </ul>
 
           <div className="flex items-center gap-2">
+            <LanguageSelector locale={locale} label={preferences.language} />
+            <ThemeSelector theme={theme} label={preferences.theme} />
+
             <Link
               href="/cart"
-              aria-label={`Cart, ${cartCount} items`}
-              className="relative rounded-full border border-white/10 p-2.5 text-muted transition-colors hover:border-white/25 hover:text-foreground"
+              aria-label={interpolate(nav.cartLabel, { count: cartCount })}
+              className="relative rounded-full border border-border p-2.5 text-muted transition-colors hover:border-foreground/30 hover:text-foreground"
             >
               <ShoppingBag className="size-4" aria-hidden />
               {cartCount > 0 ? (
-                <span className="absolute -top-1 -right-1 grid size-4.5 place-items-center rounded-full bg-accent text-[10px] font-semibold text-white">
+                <span className="absolute -top-1 -right-1 grid size-4.5 place-items-center rounded-full bg-accent text-[10px] font-semibold text-accent-contrast">
                   {cartCount}
                 </span>
               ) : null}
@@ -58,8 +79,8 @@ export function SiteHeader({ cartCount }: { cartCount: number }) {
               onClick={() => setOpen((value) => !value)}
               aria-expanded={open}
               aria-controls="mobile-nav"
-              aria-label={open ? "Close menu" : "Open menu"}
-              className="rounded-full border border-white/10 p-2.5 text-muted transition-colors hover:text-foreground md:hidden"
+              aria-label={open ? nav.closeMenu : nav.openMenu}
+              className="rounded-full border border-border p-2.5 text-muted transition-colors hover:text-foreground md:hidden"
             >
               {open ? (
                 <X className="size-4" aria-hidden />
@@ -79,18 +100,18 @@ export function SiteHeader({ cartCount }: { cartCount: number }) {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="overflow-hidden border-t border-white/5 md:hidden"
+            className="overflow-hidden border-t border-border md:hidden"
           >
             <Container>
               <ul className="flex flex-col py-3">
                 {mainNav.map((link) => (
-                  <li key={link.label}>
+                  <li key={link.labelKey}>
                     <Link
                       href={link.href}
                       onClick={() => setOpen(false)}
                       className="block py-3 text-sm text-muted transition-colors hover:text-foreground"
                     >
-                      {link.label}
+                      {nav[link.labelKey]}
                     </Link>
                   </li>
                 ))}

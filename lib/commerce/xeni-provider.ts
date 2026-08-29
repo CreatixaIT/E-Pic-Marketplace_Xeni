@@ -19,5 +19,9 @@ export const xeniProvider: CommerceProvider = {
   getStoreBySlug: unimplemented,
   getProducts: unimplemented,
   getProductsByStore: unimplemented,
+  getProductsByCategory: unimplemented,
+  getCategories: unimplemented,
+  getCollection: unimplemented,
+  getPromoSlides: unimplemented,
   getCart: unimplemented,
 };

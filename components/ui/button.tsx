@@ -8,11 +8,10 @@ type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-foreground text-background hover:bg-white/85 focus-visible:outline-white",
+    "bg-foreground text-background hover:opacity-85 focus-visible:outline-accent",
   secondary:
-    "border border-white/15 bg-white/5 text-foreground hover:border-white/30 hover:bg-white/10 focus-visible:outline-white",
-  ghost:
-    "text-muted hover:text-foreground focus-visible:outline-white",
+    "border border-border bg-surface text-foreground hover:border-foreground/30 focus-visible:outline-accent",
+  ghost: "text-muted hover:text-foreground focus-visible:outline-accent",
 };
 
 const sizes: Record<Size, string> = {

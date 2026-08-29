@@ -1,0 +1,75 @@
+import type { Dictionary } from "@/lib/i18n/types";
+
+export const bn: Dictionary = {
+  nav: {
+    home: "E-pic হোম",
+    explore: "অন্বেষণ",
+    stores: "স্টোর",
+    openStore: "নিজের স্টোর খুলুন",
+    about: "পরিচিতি",
+    cart: "কার্ট",
+    cartLabel: "কার্ট, {count}টি পণ্য",
+    openMenu: "মেনু খুলুন",
+    closeMenu: "মেনু বন্ধ করুন",
+  },
+  preferences: {
+    theme: "থিম",
+    language: "ভাষা",
+  },
+  hero: {
+    badge: "মার্কেটপ্লেস প্রিভিউ",
+    tagline: "ব্র্যান্ড খুঁজুন। তাদের জগতে ঢুকুন। ভিন্নভাবে কেনাকাটা করুন।",
+    previous: "আগের স্লাইড",
+    next: "পরের স্লাইড",
+    pause: "স্লাইডশো থামান",
+    play: "স্লাইডশো চালান",
+    slideLabel: "স্লাইড {current} / {total}",
+    goToSlide: "{index} নম্বর স্লাইডে যান",
+  },
+  discovery: {
+    eyebrow: "আবিষ্কার",
+    title: "E-pic ঘুরে দেখুন",
+    description:
+      "মার্কেটপ্লেসের সবকিছু এক ক্লিক দূরে। একটি ক্যাটাগরি বেছে নিয়ে দেখা শুরু করুন।",
+    allCategories: "সব",
+    empty: "এই ক্যাটাগরিতে এখনো কিছু নেই।",
+    viewAll: "সব পণ্য দেখুন",
+    resultCount: "{count}টি পণ্য",
+  },
+  collections: {
+    eyebrow: "কিউরেটেড",
+    title: "এই সপ্তাহের নির্বাচন",
+    description:
+      "মার্কেটপ্লেস জুড়ে বাছাই করা পণ্য, স্টোরগুলো নতুন কিছু ছাড়লেই হালনাগাদ হয়।",
+    trending: "এখন জনপ্রিয়",
+    featured: "নির্বাচিত",
+    newArrivals: "নতুন এসেছে",
+  },
+  worlds: {
+    eyebrow: "স্টোর ওয়ার্ল্ড",
+    title: "তাদের জগতে প্রবেশ করুন",
+    description:
+      "প্রতিটি ব্র্যান্ড নিজের স্টোরফ্রন্ট চালায় — নিজের চেহারা, নিজের ছন্দ, পণ্য দেখানোর নিজস্ব ধরন।",
+    enterStore: "স্টোরে প্রবেশ করুন",
+    viewAllStores: "সব স্টোর দেখুন",
+    products: "পণ্য",
+  },
+  seller: {
+    eyebrow: "বিক্রেতাদের জন্য",
+    title: "আপনার পণ্যের নিজস্ব জগৎ প্রাপ্য",
+    description:
+      "টেমপ্লেট নয় — আপনার ব্র্যান্ডের মতো দেখতে একটি স্টোরফ্রন্ট খুলুন। ক্যাটালগ, অর্ডার ও পেমেন্ট আসবে কমার্স ইন্টিগ্রেশনের সঙ্গে।",
+    cta: "নিজের স্টোর খুলুন",
+    secondaryCta: "E-pic কীভাবে কাজ করে",
+  },
+  footer: {
+    marketplace: "মার্কেটপ্লেস",
+    sellers: "বিক্রেতা",
+    note: "প্রিভিউ সংস্করণ — কমার্স কার্যক্রম আসবে Xeni-র সঙ্গে।",
+  },
+  badges: {
+    new: "নতুন",
+    featured: "নির্বাচিত",
+    trending: "জনপ্রিয়",
+  },
+};

@@ -24,7 +24,7 @@ export default async function CartPage() {
 
       <Section>
         {cart.lines.length === 0 ? (
-          <div className="rounded-3xl border border-white/10 bg-surface p-12 text-center">
+          <div className="rounded-3xl border border-border bg-surface p-12 text-center">
             <p className="text-lg font-medium">Your bag is empty</p>
             <p className="mt-2 text-sm text-muted">
               Find a world you like and start there.
@@ -35,7 +35,7 @@ export default async function CartPage() {
           </div>
         ) : (
           <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
-            <ul className="divide-y divide-white/5 rounded-3xl border border-white/10 bg-surface">
+            <ul className="divide-y divide-border rounded-3xl border border-border bg-surface">
               {cart.lines.map((line) => (
                 <li key={line.id} className="flex items-center gap-5 p-5">
                   <div
@@ -64,7 +64,7 @@ export default async function CartPage() {
               ))}
             </ul>
 
-            <aside className="h-fit rounded-3xl border border-white/10 bg-surface p-6">
+            <aside className="h-fit rounded-3xl border border-border bg-surface p-6">
               <h2 className="text-sm font-semibold tracking-wide uppercase">
                 Summary
               </h2>
@@ -78,7 +78,7 @@ export default async function CartPage() {
                   <dd className="text-muted">Calculated at checkout</dd>
                 </div>
               </dl>
-              <p className="mt-6 flex items-start gap-2 rounded-xl border border-white/10 bg-background/60 p-3 text-xs leading-relaxed text-muted">
+              <p className="mt-6 flex items-start gap-2 rounded-xl border border-border bg-background/60 p-3 text-xs leading-relaxed text-muted">
                 <Lock className="mt-0.5 size-3.5 shrink-0" aria-hidden />
                 Checkout is disabled in this preview. No payment provider is
                 connected.

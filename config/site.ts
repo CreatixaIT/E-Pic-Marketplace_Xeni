@@ -1,4 +1,4 @@
-import type { NavLink } from "@/types";
+import type { FooterNavGroup, NavLink } from "@/types";
 
 export const siteConfig = {
   name: "E-pic",
@@ -9,26 +9,26 @@ export const siteConfig = {
 } as const;
 
 export const mainNav: NavLink[] = [
-  { label: "Explore", href: "/explore" },
-  { label: "Stores", href: "/explore" },
-  { label: "Become a Seller", href: "/seller" },
-  { label: "About", href: "/about" },
+  { labelKey: "explore", href: "/explore" },
+  { labelKey: "stores", href: "/explore" },
+  { labelKey: "openStore", href: "/seller" },
+  { labelKey: "about", href: "/about" },
 ];
 
-export const footerNav: { title: string; links: NavLink[] }[] = [
+export const footerNav: FooterNavGroup[] = [
   {
-    title: "Marketplace",
+    titleKey: "marketplace",
     links: [
-      { label: "Explore", href: "/explore" },
-      { label: "Stores", href: "/explore" },
-      { label: "Cart", href: "/cart" },
+      { labelKey: "explore", href: "/explore" },
+      { labelKey: "stores", href: "/explore" },
+      { labelKey: "cart", href: "/cart" },
     ],
   },
   {
-    title: "Sellers",
+    titleKey: "sellers",
     links: [
-      { label: "Become a Seller", href: "/seller" },
-      { label: "About", href: "/about" },
+      { labelKey: "openStore", href: "/seller" },
+      { labelKey: "about", href: "/about" },
     ],
   },
 ];

@@ -7,7 +7,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { Section, SectionHeading } from "@/components/ui/section";
 
 export const metadata: Metadata = {
-  title: "Become a seller",
+  title: "Open your store",
   description:
     "Open a branded storefront on E-pic. Seller onboarding arrives with Xeni.",
 };
@@ -63,7 +63,7 @@ export default function SellerPage() {
     <>
       <PageHeader
         eyebrow="Sell on E-pic"
-        title="Bring your brand. Keep your world."
+        title="Your products deserve their own world"
         description="E-pic hosts storefronts that look like the brands behind them. Applications open when seller onboarding connects — this page is the front door."
       >
         <div className="flex flex-wrap gap-3">
@@ -85,7 +85,7 @@ export default function SellerPage() {
           {benefits.map((benefit, index) => (
             <li key={benefit.id}>
               <Reveal delay={index * 0.06} className="h-full">
-                <div className="h-full rounded-2xl border border-white/10 bg-surface p-6">
+                <div className="h-full rounded-2xl border border-border bg-surface p-6">
                   <benefit.icon className="size-5 text-accent" aria-hidden />
                   <h3 className="mt-4 text-base font-medium">
                     {benefit.title}
@@ -100,7 +100,7 @@ export default function SellerPage() {
         </ul>
       </Section>
 
-      <Section className="border-t border-white/5 bg-surface/40">
+      <Section className="border-t border-border bg-surface/40">
         <SectionHeading
           eyebrow="How it works"
           title="Three steps from application to first sale"
@@ -109,7 +109,7 @@ export default function SellerPage() {
           {steps.map((step, index) => (
             <li key={step.title}>
               <Reveal delay={index * 0.08} className="h-full">
-                <div className="h-full rounded-2xl border border-white/10 bg-background/60 p-6">
+                <div className="h-full rounded-2xl border border-border bg-background/60 p-6">
                   <span className="text-xs font-semibold tracking-[0.2em] text-accent uppercase">
                     Step {index + 1}
                   </span>
@@ -123,7 +123,7 @@ export default function SellerPage() {
           ))}
         </ol>
 
-        <p className="mt-10 rounded-2xl border border-white/10 bg-background/60 p-5 text-sm leading-relaxed text-muted">
+        <p className="mt-10 rounded-2xl border border-border bg-background/60 p-5 text-sm leading-relaxed text-muted">
           Seller onboarding, verification and payouts will be handled by the
           commerce system. No application form is collected in this preview.
         </p>

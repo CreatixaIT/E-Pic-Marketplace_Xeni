@@ -1,0 +1,75 @@
+import type { Dictionary } from "@/lib/i18n/types";
+
+export const en: Dictionary = {
+  nav: {
+    home: "E-pic home",
+    explore: "Explore",
+    stores: "Stores",
+    openStore: "Open Your Store",
+    about: "About",
+    cart: "Cart",
+    cartLabel: "Cart, {count} items",
+    openMenu: "Open menu",
+    closeMenu: "Close menu",
+  },
+  preferences: {
+    theme: "Theme",
+    language: "Language",
+  },
+  hero: {
+    badge: "Marketplace preview",
+    tagline: "Discover brands. Enter their worlds. Shop differently.",
+    previous: "Previous slide",
+    next: "Next slide",
+    pause: "Pause slideshow",
+    play: "Play slideshow",
+    slideLabel: "Slide {current} of {total}",
+    goToSlide: "Go to slide {index}",
+  },
+  discovery: {
+    eyebrow: "Discover",
+    title: "Explore E-pic",
+    description:
+      "Everything on the marketplace, one filter away. Pick a category and start browsing.",
+    allCategories: "All",
+    empty: "Nothing in this category yet.",
+    viewAll: "View all products",
+    resultCount: "{count} products",
+  },
+  collections: {
+    eyebrow: "Curated",
+    title: "Chosen this week",
+    description:
+      "Editorial picks from across the marketplace, refreshed as stores release new work.",
+    trending: "Trending Now",
+    featured: "Featured",
+    newArrivals: "New Arrivals",
+  },
+  worlds: {
+    eyebrow: "Store worlds",
+    title: "Enter Their Worlds",
+    description:
+      "Each brand runs its own storefront — its own look, its own pace, its own way of revealing a catalogue.",
+    enterStore: "Enter Store",
+    viewAllStores: "View all stores",
+    products: "products",
+  },
+  seller: {
+    eyebrow: "For sellers",
+    title: "Your products deserve their own world",
+    description:
+      "Open a storefront that looks like your brand, not like a template. Catalogue, orders and payouts arrive with the commerce integration.",
+    cta: "Open Your Store",
+    secondaryCta: "How E-pic works",
+  },
+  footer: {
+    marketplace: "Marketplace",
+    sellers: "Sellers",
+    note: "Preview build — commerce operations arrive with Xeni.",
+  },
+  badges: {
+    new: "New",
+    featured: "Featured",
+    trending: "Trending",
+  },
+};
