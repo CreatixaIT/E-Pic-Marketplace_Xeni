@@ -34,4 +34,7 @@ export type CartContextType = {
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   isCrossStoreCheckout: (product: Product) => boolean;
+  // Express checkout: persist non-sensitive preferences locally
+  getSavedCustomerPreferences: () => { fullName?: string; email?: string; phone?: string } | null;
+  saveCustomerPreferences: (preferences: { fullName: string; email: string; phone: string }) => void;
 };

@@ -3,7 +3,13 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import type { Product } from "@/lib/commerce/types";
 import type { CartContextType, CartItem, CartState } from "./types";
-import { loadCartFromStorage, saveCartToStorage, clearCartFromStorage } from "./storage";
+import { 
+  loadCartFromStorage, 
+  saveCartToStorage, 
+  clearCartFromStorage,
+  loadCustomerPreferences,
+  saveCustomerPreferences 
+} from "./storage";
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -103,6 +109,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return cart.storeId !== null && cart.storeId !== product.storeId;
   };
 
+  const getSavedCustomerPreferences = () => {
+    return loadCustomerPreferences();
+  };
+
+  const saveCustomerPreferencesData = (preferences: { fullName: string; email: string; phone: string }) => {
+    saveCustomerPreferences(preferences);
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -117,6 +131,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         updateQuantity,
         clearCart,
         isCrossStoreCheckout,
+        getSavedCustomerPreferences,
+        saveCustomerPreferences: saveCustomerPreferencesData,
       }}
     >
       {children}

@@ -1,13 +1,15 @@
 "use client";
 
-import { Lock, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { formatMoney } from "@/lib/utils";
 import type { Dictionary } from "@/lib/i18n/types";
+import { useRouter } from "next/navigation";
 
 export function CartClient({ dictionary }: { dictionary: Dictionary }) {
+  const router = useRouter();
   const {
     items,
     storeName,
@@ -139,21 +141,12 @@ export function CartClient({ dictionary }: { dictionary: Dictionary }) {
           </div>
         </dl>
         
-        {/* Checkout Placeholder */}
-        <div className="mt-6 rounded-xl border border-border bg-background/60 p-4">
-          <div className="flex items-start gap-3">
-            <Lock className="mt-0.5 size-4 text-muted" aria-hidden />
-            <div>
-              <p className="text-sm font-medium">{dictionary.cart.checkoutComing}</p>
-              <p className="mt-1 text-xs text-muted">
-                Checkout functionality will be added in a future milestone.
-              </p>
-            </div>
-          </div>
-        </div>
-
         <div className="mt-5">
-          <Button disabled className="w-full">
+          <Button 
+            onClick={() => router.push("/checkout")}
+            className="w-full"
+            size="lg"
+          >
             {dictionary.cart.checkout}
           </Button>
         </div>
