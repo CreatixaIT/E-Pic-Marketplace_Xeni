@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { AuthProvider } from "@/components/providers/session-provider";
 import { CartProvider } from "@/lib/cart";
 import { CheckoutProvider } from "@/lib/checkout";
 import { getPreferences } from "@/lib/preferences/server";
@@ -37,18 +38,20 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <CartProvider>
-          <CheckoutProvider>
-            <SiteHeader
-              nav={dictionary.nav}
-              preferences={dictionary.preferences}
-              theme={theme}
-              locale={locale}
-            />
-            <main className="flex-1">{children}</main>
-            <SiteFooter nav={dictionary.nav} footer={dictionary.footer} />
-          </CheckoutProvider>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <CheckoutProvider>
+              <SiteHeader
+                nav={dictionary.nav}
+                preferences={dictionary.preferences}
+                theme={theme}
+                locale={locale}
+              />
+              <main className="flex-1">{children}</main>
+              <SiteFooter nav={dictionary.nav} footer={dictionary.footer} />
+            </CheckoutProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -4,12 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, ShoppingBag, X } from "lucide-react";
+import { Menu, ShoppingBag, X, LogOut, User } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/layout/logo";
 import { LanguageSelector } from "@/components/preferences/language-selector";
 import { ThemeSelector } from "@/components/preferences/theme-selector";
 import { useCart } from "@/lib/cart";
+import { useSession, signOut } from "next-auth/react";
 import type { ActiveLocale } from "@/config/i18n";
 import type { ThemeId } from "@/config/themes";
 import { mainNav } from "@/config/site";
@@ -31,6 +32,11 @@ export function SiteHeader({
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const { itemCount } = useCart();
+  const { data: session } = useSession();
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/" });
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -60,6 +66,38 @@ export function SiteHeader({
           <div className="flex items-center gap-2">
             <LanguageSelector locale={locale} label={preferences.language} />
             <ThemeSelector theme={theme} label={preferences.theme} />
+
+            {/* Auth buttons */}
+            {session ? (
+              <div className="flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-2 text-sm text-muted">
+                  <User className="size-4" />
+                  <span>{session.user?.email}</span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="rounded-full border border-border p-2.5 text-muted transition-colors hover:border-foreground/30 hover:text-foreground"
+                  aria-label="Logout"
+                >
+                  <LogOut className="size-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/login"
+                  className="text-sm text-muted transition-colors hover:text-foreground"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="text-sm font-medium text-accent transition-colors hover:text-accent/80"
+                >
+                  Sign up
+                </Link>
+              </div>
+            )}
 
             <Link
               href="/cart"
@@ -115,6 +153,42 @@ export function SiteHeader({
                     </Link>
                   </li>
                 ))}
+                <li className="border-t border-border pt-3 mt-3">
+                  {session ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm text-muted px-3">
+                        <User className="size-4" />
+                        <span className="truncate">{session.user?.email}</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setOpen(false);
+                        }}
+                        className="block w-full text-left py-3 px-3 text-sm text-muted transition-colors hover:text-foreground"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <Link
+                        href="/login"
+                        onClick={() => setOpen(false)}
+                        className="block py-3 px-3 text-sm text-muted transition-colors hover:text-foreground"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        href="/register"
+                        onClick={() => setOpen(false)}
+                        className="block py-3 px-3 text-sm text-accent transition-colors hover:text-accent/80"
+                      >
+                        Sign up
+                      </Link>
+                    </div>
+                  )}
+                </li>
               </ul>
             </Container>
           </motion.div>
