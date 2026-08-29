@@ -70,4 +70,30 @@ export type Dictionary = {
     featured: string;
     trending: string;
   };
+  cart: {
+    empty: string;
+    emptyDescription: string;
+    addToCart: string;
+    buyNow: string;
+    quantity: string;
+    remove: string;
+    subtotal: string;
+    checkout: string;
+    checkoutComing: string;
+    keepShopping: string;
+    clearCart: string;
+    crossStoreTitle: string;
+    crossStoreDescription: string;
+    keepCurrentCart: string;
+    clearAndAdd: string;
+    items: string;
+    inStock: string;
+    lowStock: string;
+    outOfStock: string;
+  };
+  product: {
+    highlights: string;
+    relatedProducts: string;
+    backToStore: string;
+  };
 };

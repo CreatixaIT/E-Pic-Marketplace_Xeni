@@ -6,11 +6,11 @@ export function cn(...classes: (string | false | null | undefined)[]): string {
 }
 
 export function formatMoney(
-  { amount, currency }: Money,
+  money: Money | { amount: number; currency: string },
   locale: Locale = defaultLocale,
 ): string {
   return new Intl.NumberFormat(intlTagOf(locale), {
     style: "currency",
-    currency,
-  }).format(amount / 100);
+    currency: money.currency as Money["currency"],
+  }).format(money.amount / 100);
 }

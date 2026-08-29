@@ -9,6 +9,7 @@ import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/layout/logo";
 import { LanguageSelector } from "@/components/preferences/language-selector";
 import { ThemeSelector } from "@/components/preferences/theme-selector";
+import { useCart } from "@/lib/cart";
 import type { ActiveLocale } from "@/config/i18n";
 import type { ThemeId } from "@/config/themes";
 import { mainNav } from "@/config/site";
@@ -17,13 +18,11 @@ import type { Dictionary } from "@/lib/i18n/types";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader({
-  cartCount,
   nav,
   preferences,
   theme,
   locale,
 }: {
-  cartCount: number;
   nav: Dictionary["nav"];
   preferences: Dictionary["preferences"];
   theme: ThemeId;
@@ -31,6 +30,7 @@ export function SiteHeader({
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const { itemCount } = useCart();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -63,13 +63,13 @@ export function SiteHeader({
 
             <Link
               href="/cart"
-              aria-label={interpolate(nav.cartLabel, { count: cartCount })}
+              aria-label={interpolate(nav.cartLabel, { count: itemCount })}
               className="relative rounded-full border border-border p-2.5 text-muted transition-colors hover:border-foreground/30 hover:text-foreground"
             >
               <ShoppingBag className="size-4" aria-hidden />
-              {cartCount > 0 ? (
+              {itemCount > 0 ? (
                 <span className="absolute -top-1 -right-1 grid size-4.5 place-items-center rounded-full bg-accent text-[10px] font-semibold text-accent-contrast">
-                  {cartCount}
+                  {itemCount}
                 </span>
               ) : null}
             </Link>

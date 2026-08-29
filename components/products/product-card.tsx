@@ -1,3 +1,6 @@
+"use client";
+
+import Link from "next/link";
 import type { ActiveLocale } from "@/config/i18n";
 import type { Product } from "@/lib/commerce/types";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +17,10 @@ export function ProductCard({
   locale: ActiveLocale;
 }) {
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-foreground/25">
+    <Link 
+      href={`/products/${product.slug}`}
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-foreground/25"
+    >
       <div className="relative overflow-hidden">
         <div
           role="img"
@@ -41,6 +47,6 @@ export function ProductCard({
           {formatMoney(product.price, locale)}
         </p>
       </div>
-    </article>
+    </Link>
   );
 }

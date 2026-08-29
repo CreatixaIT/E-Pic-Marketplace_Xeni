@@ -18,6 +18,8 @@ export type Image = {
   /** Placeholder gradient token until real assets exist. */
   gradient: string;
   alt: string;
+  /** Future: real image URL when assets are available */
+  url?: string;
 };
 
 /** Marketplace-wide taxonomy. Stores and products both map onto it. */
@@ -51,6 +53,34 @@ export type StoreTheme = {
   accentText: string;
 };
 
+/** Storefront presentation templates */
+export type StoreTemplate = "minimal" | "editorial" | "immersive";
+
+/** Store-specific visual configuration for the chosen template */
+export type StoreVisualConfig = {
+  template: StoreTemplate;
+  /** Hero section content */
+  hero: {
+    title?: string;
+    description?: string;
+    ctaLabel?: string;
+  };
+  /** Brand story section */
+  brandStory?: {
+    title: string;
+    content: string;
+  };
+  /** Featured collection IDs */
+  featuredCollectionIds?: CollectionId[];
+  /** Template-specific visual settings */
+  visual: {
+    /** Whether to show ambient motion effects */
+    ambientMotion: boolean;
+    /** Layout density */
+    density: "compact" | "comfortable" | "spacious";
+  };
+};
+
 export type Store = {
   id: string;
   slug: string;
@@ -64,6 +94,8 @@ export type Store = {
   featured: boolean;
   cover: Image;
   theme: StoreTheme;
+  /** Storefront configuration for template-driven presentation */
+  visualConfig: StoreVisualConfig;
 };
 
 export type Product = {
@@ -74,11 +106,16 @@ export type Product = {
   name: string;
   description: string;
   category: CategoryId;
+  categoryLabel: string;
   price: Money;
   image: Image;
   badge?: ProductBadge;
   collections: CollectionId[];
   tags: string[];
+  /** Product highlights/specifications for detail page */
+  highlights?: string[];
+  /** Availability status */
+  availability: "in-stock" | "low-stock" | "out-of-stock";
 };
 
 /** A promotional slide in the homepage hero. Content is mock data. */
@@ -121,6 +158,7 @@ export interface CommerceProvider {
   getStores(): Promise<Store[]>;
   getFeaturedStores(): Promise<Store[]>;
   getStoreBySlug(slug: string): Promise<Store | null>;
+  getStoreById(storeId: string): Promise<Store | null>;
   getProducts(): Promise<Product[]>;
   getProductsByStore(storeId: string): Promise<Product[]>;
   getProductsByCategory(category: CategoryId): Promise<Product[]>;
@@ -128,4 +166,5 @@ export interface CommerceProvider {
   getCollection(collection: CollectionId): Promise<Product[]>;
   getPromoSlides(): Promise<PromoSlide[]>;
   getCart(): Promise<Cart>;
+  getProductBySlug(slug: string): Promise<Product | null>;
 }

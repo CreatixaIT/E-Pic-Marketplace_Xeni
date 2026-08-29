@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
-import { getCommerceProvider } from "@/lib/commerce";
+import { CartProvider } from "@/lib/cart";
 import { getPreferences } from "@/lib/preferences/server";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
@@ -26,11 +26,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const [cart, { theme, locale, dir, dictionary }] = await Promise.all([
-    getCommerceProvider().getCart(),
-    getPreferences(),
-  ]);
-  const cartCount = cart.lines.reduce((total, line) => total + line.quantity, 0);
+  const { theme, locale, dir, dictionary } = await getPreferences();
 
   return (
     <html
@@ -40,15 +36,16 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <SiteHeader
-          cartCount={cartCount}
-          nav={dictionary.nav}
-          preferences={dictionary.preferences}
-          theme={theme}
-          locale={locale}
-        />
-        <main className="flex-1">{children}</main>
-        <SiteFooter nav={dictionary.nav} footer={dictionary.footer} />
+        <CartProvider>
+          <SiteHeader
+            nav={dictionary.nav}
+            preferences={dictionary.preferences}
+            theme={theme}
+            locale={locale}
+          />
+          <main className="flex-1">{children}</main>
+          <SiteFooter nav={dictionary.nav} footer={dictionary.footer} />
+        </CartProvider>
       </body>
     </html>
   );

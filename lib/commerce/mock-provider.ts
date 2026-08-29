@@ -49,6 +49,23 @@ const stores: Store[] = [
       pattern: "rings",
       accentText: "text-amber-200",
     },
+    visualConfig: {
+      template: "immersive",
+      hero: {
+        title: "Light that lives with you",
+        description: "Each piece is finished by hand in our Lisbon studio.",
+        ctaLabel: "Explore the collection",
+      },
+      brandStory: {
+        title: "The Aurora Story",
+        content: "Founded in 2019, Aurora Atelier began with a simple question: what if light could feel like daylight? Our small studio in Lisbon shapes brass and opal glass into lamps that warm a room without dominating it. Every piece is hand-finished, numbered, and built to last.",
+      },
+      featuredCollectionIds: ["featured"],
+      visual: {
+        ambientMotion: true,
+        density: "spacious",
+      },
+    },
   },
   {
     id: "str_northbound",
@@ -70,6 +87,23 @@ const stores: Store[] = [
       gradient: "from-sky-300 via-cyan-500 to-blue-700",
       pattern: "beams",
       accentText: "text-sky-200",
+    },
+    visualConfig: {
+      template: "minimal",
+      hero: {
+        title: "Tested above the tree line",
+        description: "Technical gear for the long way round.",
+        ctaLabel: "Shop the collection",
+      },
+      brandStory: {
+        title: "Field-Tested",
+        content: "Based in Tromsø, Norway, Northbound Supply designs outerwear and packs that are tested in Arctic conditions before they ever ship. We believe gear should be simple, functional, and built to last.",
+      },
+      featuredCollectionIds: ["trending"],
+      visual: {
+        ambientMotion: false,
+        density: "compact",
+      },
     },
   },
   {
@@ -93,6 +127,23 @@ const stores: Store[] = [
       pattern: "grid",
       accentText: "text-neutral-200",
     },
+    visualConfig: {
+      template: "minimal",
+      hero: {
+        title: "One object at a time",
+        description: "Current release: Edition 07 Carafe",
+        ctaLabel: "View current edition",
+      },
+      brandStory: {
+        title: "The Mono Philosophy",
+        content: "Mono Goods operates on a simple principle: do one thing perfectly. Each release is a single object, designed and produced until the next one is ready. Based in Kyoto, Japan.",
+      },
+      featuredCollectionIds: ["featured"],
+      visual: {
+        ambientMotion: false,
+        density: "compact",
+      },
+    },
   },
   {
     id: "str_verdant",
@@ -114,6 +165,23 @@ const stores: Store[] = [
       gradient: "from-emerald-300 via-teal-500 to-emerald-800",
       pattern: "rings",
       accentText: "text-emerald-200",
+    },
+    visualConfig: {
+      template: "editorial",
+      hero: {
+        title: "Six ingredients. No secrets.",
+        description: "Small-batch skincare with full ingredient disclosure.",
+        ctaLabel: "Discover the routine",
+      },
+      brandStory: {
+        title: "Transparent Formulation",
+        content: "Verdant Lab was founded in Copenhagen with a commitment to transparency. Every formulation is developed in-house, batched monthly, and printed with full ingredient disclosure. No hidden synthetics, no proprietary blends.",
+      },
+      featuredCollectionIds: ["featured", "trending"],
+      visual: {
+        ambientMotion: true,
+        density: "comfortable",
+      },
     },
   },
   {
@@ -137,6 +205,23 @@ const stores: Store[] = [
       pattern: "grid",
       accentText: "text-orange-200",
     },
+    visualConfig: {
+      template: "editorial",
+      hero: {
+        title: "Fifty copies at a time",
+        description: "Independent risograph prints, hand-numbered in Mexico City.",
+        ctaLabel: "Browse the prints",
+      },
+      brandStory: {
+        title: "Slow by Design",
+        content: "Slow Press works with independent artists to produce risograph prints in tiny runs—fifty copies at a time, numbered by hand in our Mexico City studio. Each print is unique, each run is limited.",
+      },
+      featuredCollectionIds: ["featured"],
+      visual: {
+        ambientMotion: true,
+        density: "comfortable",
+      },
+    },
   },
   {
     id: "str_hallow",
@@ -159,6 +244,23 @@ const stores: Store[] = [
       pattern: "beams",
       accentText: "text-indigo-200",
     },
+    visualConfig: {
+      template: "immersive",
+      hero: {
+        title: "Audio that disappears",
+        description: "Cabinetry-first design with reclaimed hardwood.",
+        ctaLabel: "Listen to the difference",
+      },
+      brandStory: {
+        title: "Cabinetry First",
+        content: "Hallow Audio is built on a simple idea: the cabinet matters as much as the driver. Based in Portland, Oregon, we assemble speakers from reclaimed hardwood and open-source drivers. No plastic, no hidden electronics.",
+      },
+      featuredCollectionIds: ["featured"],
+      visual: {
+        ambientMotion: true,
+        density: "spacious",
+      },
+    },
   },
 ];
 
@@ -173,11 +275,14 @@ const products: Product[] = [
     name: "Opal Table Lamp",
     description: "Blown opal shade on a solid brass stem with a dimmable warm core.",
     category: "home",
+    categoryLabel: categoryLabels.home,
     price: usd(28900),
     image: { gradient: "from-amber-200 to-rose-500", alt: "Opal table lamp" },
     badge: "featured",
     collections: ["featured", "trending"],
     tags: ["lighting", "brass"],
+    highlights: ["Hand-blown opal glass", "Solid brass stem", "Dimmable LED core", "Hand-finished in Lisbon"],
+    availability: "in-stock",
   },
   {
     id: "prd_halo_sconce",
@@ -187,11 +292,14 @@ const products: Product[] = [
     name: "Halo Wall Sconce",
     description: "A thin brass ring that throws light up the wall and nowhere else.",
     category: "home",
+    categoryLabel: categoryLabels.home,
     price: usd(19500),
     image: { gradient: "from-rose-200 to-fuchsia-600", alt: "Halo wall sconce" },
     collections: ["new-arrivals"],
     badge: "new",
     tags: ["lighting"],
+    highlights: ["Solid brass ring", "Upward-facing light", "Minimal installation", "Warm white LED"],
+    availability: "in-stock",
   },
   {
     id: "prd_ridge_shell",
@@ -201,11 +309,14 @@ const products: Product[] = [
     name: "Ridge Shell Jacket",
     description: "Three-layer waterproof shell with taped seams and a helmet-ready hood.",
     category: "fashion",
+    categoryLabel: categoryLabels.fashion,
     price: usd(42000),
     image: { gradient: "from-sky-200 to-blue-700", alt: "Ridge shell jacket" },
     badge: "trending",
     collections: ["trending", "featured"],
     tags: ["outerwear", "waterproof"],
+    highlights: ["3-layer waterproof membrane", "Fully taped seams", "Helmet-compatible hood", "Pit zips for ventilation"],
+    availability: "in-stock",
   },
   {
     id: "prd_fjord_pack",
@@ -215,10 +326,13 @@ const products: Product[] = [
     name: "Fjord 40L Pack",
     description: "Roll-top hauler in recycled sailcloth, balanced for long approaches.",
     category: "fashion",
+    categoryLabel: categoryLabels.fashion,
     price: usd(23500),
     image: { gradient: "from-cyan-200 to-blue-800", alt: "Fjord 40 litre pack" },
     collections: ["trending"],
     tags: ["packs"],
+    highlights: ["40L capacity", "Recycled sailcloth", "Roll-top closure", "Frame-carry design"],
+    availability: "in-stock",
   },
   {
     id: "prd_thermal_layer",
@@ -228,11 +342,14 @@ const products: Product[] = [
     name: "Thermal Base Layer",
     description: "Merino blend knitted in one piece, so there is nothing to chafe.",
     category: "fashion",
+    categoryLabel: categoryLabels.fashion,
     price: usd(11800),
     image: { gradient: "from-slate-200 to-sky-700", alt: "Thermal base layer" },
     badge: "new",
     collections: ["new-arrivals"],
     tags: ["layers", "merino"],
+    highlights: ["Seamless construction", "Merino wool blend", "Moisture-wicking", "Odour-resistant"],
+    availability: "low-stock",
   },
   {
     id: "prd_edition_07",
@@ -242,11 +359,14 @@ const products: Product[] = [
     name: "Edition 07 Carafe",
     description: "Borosilicate carafe with a cork stopper. Current and only release.",
     category: "home",
+    categoryLabel: categoryLabels.home,
     price: usd(7400),
     image: { gradient: "from-neutral-100 to-neutral-600", alt: "Edition 07 carafe" },
     badge: "featured",
     collections: ["featured"],
     tags: ["kitchen", "limited"],
+    highlights: ["Borosilicate glass", "Natural cork stopper", "Hand-finished", "Limited edition"],
+    availability: "in-stock",
   },
   {
     id: "prd_desk_tray",
@@ -256,10 +376,13 @@ const products: Product[] = [
     name: "Folded Desk Tray",
     description: "A single sheet of anodised aluminium, folded four times. Nothing else.",
     category: "lifestyle",
+    categoryLabel: categoryLabels.lifestyle,
     price: usd(6200),
     image: { gradient: "from-zinc-200 to-zinc-700", alt: "Folded desk tray" },
     collections: ["trending"],
     tags: ["desk"],
+    highlights: ["Single sheet construction", "Anodised aluminium", "Four precise folds", "No hardware"],
+    availability: "in-stock",
   },
   {
     id: "prd_barrier_serum",
@@ -269,11 +392,14 @@ const products: Product[] = [
     name: "Barrier Serum",
     description: "Six ingredients, batched monthly, dated on the base of every bottle.",
     category: "beauty",
+    categoryLabel: categoryLabels.beauty,
     price: usd(5200),
     image: { gradient: "from-emerald-200 to-teal-700", alt: "Barrier serum bottle" },
     badge: "trending",
     collections: ["trending", "featured"],
     tags: ["skincare"],
+    highlights: ["Only 6 ingredients", "Monthly batches", "Dated bottles", "Full disclosure"],
+    availability: "in-stock",
   },
   {
     id: "prd_clay_cleanser",
@@ -283,11 +409,14 @@ const products: Product[] = [
     name: "Green Clay Cleanser",
     description: "A gentle clay wash that does not strip the skin it is cleaning.",
     category: "beauty",
+    categoryLabel: categoryLabels.beauty,
     price: usd(3400),
     image: { gradient: "from-lime-200 to-emerald-700", alt: "Green clay cleanser" },
     collections: ["new-arrivals"],
     badge: "new",
     tags: ["skincare"],
+    highlights: ["Green clay base", "Gentle cleansing", "Non-stripping", "pH balanced"],
+    availability: "in-stock",
   },
   {
     id: "prd_night_balm",
@@ -297,10 +426,13 @@ const products: Product[] = [
     name: "Night Repair Balm",
     description: "Thick overnight balm in a refillable glass jar, unscented by design.",
     category: "beauty",
+    categoryLabel: categoryLabels.beauty,
     price: usd(4800),
     image: { gradient: "from-teal-200 to-emerald-900", alt: "Night repair balm" },
     collections: ["featured"],
     tags: ["skincare"],
+    highlights: ["Overnight repair", "Refillable jar", "Unscented formula", "Glass packaging"],
+    availability: "in-stock",
   },
   {
     id: "prd_riso_set",
@@ -310,11 +442,14 @@ const products: Product[] = [
     name: "Riso Print Set",
     description: "Three A3 risograph prints, hand-numbered from a run of fifty.",
     category: "lifestyle",
+    categoryLabel: categoryLabels.lifestyle,
     price: usd(9800),
     image: { gradient: "from-orange-200 to-purple-700", alt: "Risograph print set" },
     badge: "featured",
     collections: ["featured", "trending"],
     tags: ["print", "limited"],
+    highlights: ["3 A3 prints", "Hand-numbered", "Limited to 50", "Risograph printing"],
+    availability: "low-stock",
   },
   {
     id: "prd_zine_annual",
@@ -324,11 +459,14 @@ const products: Product[] = [
     name: "Annual Zine No. 4",
     description: "Ninety pages of new work from twelve studios, saddle-stitched by hand.",
     category: "lifestyle",
+    categoryLabel: categoryLabels.lifestyle,
     price: usd(2600),
     image: { gradient: "from-red-200 to-purple-800", alt: "Annual zine number four" },
     badge: "new",
     collections: ["new-arrivals"],
     tags: ["print"],
+    highlights: ["90 pages", "12 studios", "Saddle-stitched", "Hand assembly"],
+    availability: "in-stock",
   },
   {
     id: "prd_alcove_speaker",
@@ -338,11 +476,14 @@ const products: Product[] = [
     name: "Alcove Bookshelf Speaker",
     description: "Reclaimed ash cabinet, paper cone driver, sold as a matched pair.",
     category: "technology",
+    categoryLabel: categoryLabels.technology,
     price: usd(64000),
     image: { gradient: "from-indigo-200 to-slate-800", alt: "Alcove bookshelf speaker" },
     badge: "featured",
     collections: ["featured", "trending"],
     tags: ["audio", "pair"],
+    highlights: ["Reclaimed ash cabinet", "Paper cone driver", "Matched pair", "Open-source design"],
+    availability: "in-stock",
   },
   {
     id: "prd_field_amp",
@@ -352,10 +493,13 @@ const products: Product[] = [
     name: "Field Amplifier",
     description: "A twelve-watt desk amp with one knob and a very short signal path.",
     category: "technology",
+    categoryLabel: categoryLabels.technology,
     price: usd(38000),
     image: { gradient: "from-violet-200 to-slate-900", alt: "Field amplifier" },
     collections: ["trending"],
     tags: ["audio"],
+    highlights: ["12 watts", "Single knob control", "Short signal path", "Pure Class A"],
+    availability: "in-stock",
   },
   {
     id: "prd_thread_turntable",
@@ -365,11 +509,14 @@ const products: Product[] = [
     name: "Thread Turntable",
     description: "Belt-driven deck with a machined platter and no unnecessary lights.",
     category: "technology",
+    categoryLabel: categoryLabels.technology,
     price: usd(89000),
     image: { gradient: "from-slate-200 to-indigo-900", alt: "Thread turntable" },
     badge: "new",
     collections: ["new-arrivals", "featured"],
     tags: ["audio"],
+    highlights: ["Belt-driven", "Machined platter", "No indicator lights", "33/45 RPM"],
+    availability: "low-stock",
   },
   {
     id: "prd_linen_throw",
@@ -379,10 +526,13 @@ const products: Product[] = [
     name: "Washed Linen Throw",
     description: "Heavyweight linen, stonewashed twice, finished with a hand-rolled hem.",
     category: "home",
+    categoryLabel: categoryLabels.home,
     price: usd(14500),
     image: { gradient: "from-amber-100 to-rose-400", alt: "Washed linen throw" },
     collections: ["trending"],
     tags: ["textiles"],
+    highlights: ["Heavyweight linen", "Double stonewashed", "Hand-rolled hem", "Natural fiber"],
+    availability: "in-stock",
   },
   {
     id: "prd_wool_overshirt",
@@ -392,11 +542,14 @@ const products: Product[] = [
     name: "Wool Overshirt",
     description: "Boiled wool that shrugs off drizzle and reads as a shirt indoors.",
     category: "fashion",
+    categoryLabel: categoryLabels.fashion,
     price: usd(19800),
     image: { gradient: "from-blue-200 to-slate-700", alt: "Wool overshirt" },
     badge: "featured",
     collections: ["featured"],
     tags: ["outerwear"],
+    highlights: ["Boiled wool", "Water-resistant", "Versatile wear", "Natural insulation"],
+    availability: "in-stock",
   },
   {
     id: "prd_travel_kit",
@@ -406,11 +559,14 @@ const products: Product[] = [
     name: "Everyday Travel Kit",
     description: "A waxed canvas roll sized for exactly what a week away needs.",
     category: "lifestyle",
+    categoryLabel: categoryLabels.lifestyle,
     price: usd(8900),
     image: { gradient: "from-stone-200 to-neutral-700", alt: "Everyday travel kit" },
     collections: ["new-arrivals"],
     badge: "new",
     tags: ["travel"],
+    highlights: ["Waxed canvas", "Roll design", "Week-sized capacity", "Simple organization"],
+    availability: "in-stock",
   },
 ];
 
@@ -492,6 +648,9 @@ export const mockProvider: CommerceProvider = {
   async getStoreBySlug(slug) {
     return stores.find((store) => store.slug === slug) ?? null;
   },
+  async getStoreById(storeId: string) {
+    return stores.find((store) => store.id === storeId) ?? null;
+  },
   async getProducts() {
     return products;
   },
@@ -519,5 +678,8 @@ export const mockProvider: CommerceProvider = {
       subtotal: subtotal(cartLines),
       currency: "USD",
     };
+  },
+  async getProductBySlug(slug: string): Promise<Product | null> {
+    return products.find((product) => product.slug === slug) ?? null;
   },
 };

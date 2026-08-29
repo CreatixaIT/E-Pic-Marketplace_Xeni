@@ -2,30 +2,75 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
+type AmbientType = "aurora" | "beams" | "orbs";
+
 /**
  * Slow-drifting colour fields behind the hero. Pure CSS gradients and
  * transforms — deliberately no canvas, WebGL or 3D dependency.
  */
-export function AmbientBackdrop() {
+export function AmbientBackdrop({ type = "aurora" }: { type?: AmbientType }) {
   const reduced = useReducedMotion();
 
-  const blobs = [
-    {
-      className: "left-[-10%] top-[-20%] size-[38rem] bg-violet-600/25",
-      drift: { x: [0, 60, 0], y: [0, 40, 0] },
-      duration: 18,
-    },
-    {
-      className: "right-[-15%] top-[10%] size-[32rem] bg-sky-500/20",
-      drift: { x: [0, -50, 0], y: [0, 60, 0] },
-      duration: 22,
-    },
-    {
-      className: "bottom-[-25%] left-[25%] size-[34rem] bg-fuchsia-500/15",
-      drift: { x: [0, 40, 0], y: [0, -40, 0] },
-      duration: 26,
-    },
-  ];
+  const getBlobs = () => {
+    switch (type) {
+      case "beams":
+        return [
+          {
+            className: "left-[-10%] top-[-20%] size-[38rem] bg-sky-600/25",
+            drift: { x: [0, 60, 0], y: [0, 40, 0] },
+            duration: 18,
+          },
+          {
+            className: "right-[-15%] top-[10%] size-[32rem] bg-cyan-500/20",
+            drift: { x: [0, -50, 0], y: [0, 60, 0] },
+            duration: 22,
+          },
+          {
+            className: "bottom-[-25%] left-[25%] size-[34rem] bg-blue-500/15",
+            drift: { x: [0, 40, 0], y: [0, -40, 0] },
+            duration: 26,
+          },
+        ];
+      case "orbs":
+        return [
+          {
+            className: "left-[-10%] top-[-20%] size-[38rem] bg-emerald-600/25",
+            drift: { x: [0, 60, 0], y: [0, 40, 0] },
+            duration: 18,
+          },
+          {
+            className: "right-[-15%] top-[10%] size-[32rem] bg-teal-500/20",
+            drift: { x: [0, -50, 0], y: [0, 60, 0] },
+            duration: 22,
+          },
+          {
+            className: "bottom-[-25%] left-[25%] size-[34rem] bg-green-500/15",
+            drift: { x: [0, 40, 0], y: [0, -40, 0] },
+            duration: 26,
+          },
+        ];
+      default: // aurora
+        return [
+          {
+            className: "left-[-10%] top-[-20%] size-[38rem] bg-violet-600/25",
+            drift: { x: [0, 60, 0], y: [0, 40, 0] },
+            duration: 18,
+          },
+          {
+            className: "right-[-15%] top-[10%] size-[32rem] bg-sky-500/20",
+            drift: { x: [0, -50, 0], y: [0, 60, 0] },
+            duration: 22,
+          },
+          {
+            className: "bottom-[-25%] left-[25%] size-[34rem] bg-fuchsia-500/15",
+            drift: { x: [0, 40, 0], y: [0, -40, 0] },
+            duration: 26,
+          },
+        ];
+    }
+  };
+
+  const blobs = getBlobs();
 
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
