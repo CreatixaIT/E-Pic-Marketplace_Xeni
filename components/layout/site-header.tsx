@@ -70,10 +70,13 @@ export function SiteHeader({
             {/* Auth buttons */}
             {session ? (
               <div className="flex items-center gap-2">
-                <div className="hidden md:flex items-center gap-2 text-sm text-muted">
+                <Link
+                  href="/account"
+                  className="hidden md:flex items-center gap-2 text-sm text-muted transition-colors hover:text-foreground"
+                >
                   <User className="size-4" />
-                  <span>{session.user?.email}</span>
-                </div>
+                  <span>{nav.account || "Account"}</span>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="rounded-full border border-border p-2.5 text-muted transition-colors hover:border-foreground/30 hover:text-foreground"
@@ -156,10 +159,14 @@ export function SiteHeader({
                 <li className="border-t border-border pt-3 mt-3">
                   {session ? (
                     <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-sm text-muted px-3">
+                      <Link
+                        href="/account"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-2 py-3 px-3 text-sm text-muted transition-colors hover:text-foreground"
+                      >
                         <User className="size-4" />
-                        <span className="truncate">{session.user?.email}</span>
-                      </div>
+                        <span>{nav.account || "Account"}</span>
+                      </Link>
                       <button
                         onClick={() => {
                           handleLogout();

@@ -6,11 +6,13 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
+import { useDictionary } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 export default function RegisterPage() {
   const router = useRouter();
   const { data: session } = useSession();
+  const dict = useDictionary();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -33,23 +35,23 @@ export default function RegisterPage() {
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email) {
-      newErrors.email = "requiredField";
+      newErrors.email = dict.auth.requiredField;
     } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "invalidEmail";
+      newErrors.email = dict.auth.invalidEmail;
     }
 
     // Password validation
     if (!formData.password) {
-      newErrors.password = "requiredField";
+      newErrors.password = dict.auth.requiredField;
     } else if (formData.password.length < 8) {
-      newErrors.password = "weakPassword";
+      newErrors.password = dict.auth.weakPassword;
     }
 
     // Confirm password validation
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "requiredField";
+      newErrors.confirmPassword = dict.auth.requiredField;
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "passwordMismatch";
+      newErrors.confirmPassword = dict.auth.passwordMismatch;
     }
 
     setErrors(newErrors);
@@ -84,13 +86,13 @@ export default function RegisterPage() {
       if (!response.ok) {
         // Map API errors to form errors
         if (data.error === "Email already registered") {
-          setErrors({ email: "emailExists" });
+          setErrors({ email: dict.auth.emailExists });
         } else if (data.error === "Invalid email format") {
-          setErrors({ email: "invalidEmail" });
+          setErrors({ email: dict.auth.invalidEmail });
         } else if (data.error === "Password must be at least 8 characters long") {
-          setErrors({ password: "weakPassword" });
+          setErrors({ password: dict.auth.weakPassword });
         } else {
-          setErrors({ form: data.error || "registerError" });
+          setErrors({ form: data.error || dict.auth.registerError });
         }
         return;
       }
@@ -101,7 +103,7 @@ export default function RegisterPage() {
         router.push("/login");
       }, 2000);
     } catch {
-      setErrors({ form: "registerError" });
+      setErrors({ form: dict.auth.registerError });
     } finally {
       setIsLoading(false);
     }
@@ -125,14 +127,14 @@ export default function RegisterPage() {
       <Container>
         <div className="mx-auto max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">Register</h1>
-            <p className="text-muted">Create an account to get started</p>
+            <h1 className="text-3xl font-bold mb-2">{dict.auth.registerTitle}</h1>
+            <p className="text-muted">{dict.auth.registerDescription}</p>
           </div>
 
           {success ? (
             <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
               <div className="text-green-800 font-medium mb-2">
-                Account created successfully!
+                {dict.auth.registerSuccess}
               </div>
               <div className="text-green-600 text-sm">
                 Redirecting to login...
@@ -148,7 +150,7 @@ export default function RegisterPage() {
 
               <div>
                 <label htmlFor="name" className="block text-sm font-medium mb-2">
-                  Name <span className="text-muted">(optional)</span>
+                  {dict.auth.name} <span className="text-muted">(optional)</span>
                 </label>
                 <input
                   id="name"
@@ -156,7 +158,7 @@ export default function RegisterPage() {
                   type="text"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Enter your name"
+                  placeholder={dict.auth.namePlaceholder}
                   className={cn(
                     "w-full px-4 py-3 rounded-lg border bg-background",
                     "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
@@ -167,7 +169,7 @@ export default function RegisterPage() {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium mb-2">
-                  Email <span className="text-red-500">*</span>
+                  {dict.auth.email} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="email"
@@ -175,7 +177,7 @@ export default function RegisterPage() {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Enter your email"
+                  placeholder={dict.auth.emailPlaceholder}
                   className={cn(
                     "w-full px-4 py-3 rounded-lg border bg-background",
                     "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
@@ -190,7 +192,7 @@ export default function RegisterPage() {
 
               <div>
                 <label htmlFor="password" className="block text-sm font-medium mb-2">
-                  Password <span className="text-red-500">*</span>
+                  {dict.auth.password} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="password"
@@ -198,7 +200,7 @@ export default function RegisterPage() {
                   type="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Enter your password"
+                  placeholder={dict.auth.passwordPlaceholder}
                   className={cn(
                     "w-full px-4 py-3 rounded-lg border bg-background",
                     "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
@@ -210,13 +212,13 @@ export default function RegisterPage() {
                   <p className="mt-1 text-sm text-red-500">{errors.password}</p>
                 )}
                 <p className="mt-1 text-xs text-muted">
-                  Must be at least 8 characters
+                  {dict.auth.weakPassword}
                 </p>
               </div>
 
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
-                  Confirm Password <span className="text-red-500">*</span>
+                  {dict.auth.confirmPassword} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="confirmPassword"
@@ -224,7 +226,7 @@ export default function RegisterPage() {
                   type="password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  placeholder="Confirm your password"
+                  placeholder={dict.auth.confirmPasswordPlaceholder}
                   className={cn(
                     "w-full px-4 py-3 rounded-lg border bg-background",
                     "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
@@ -242,16 +244,16 @@ export default function RegisterPage() {
                 disabled={isLoading}
                 className="w-full"
               >
-                {isLoading ? "Creating account..." : "Sign up"}
+                {isLoading ? dict.auth.registering : dict.auth.signUp}
               </Button>
 
               <p className="text-center text-sm text-muted">
-                Already have an account?{" "}
+                {dict.auth.hasAccount}{" "}
                 <Link
                   href="/login"
                   className="text-accent hover:underline font-medium"
                 >
-                  Sign in
+                  {dict.auth.signIn}
                 </Link>
               </p>
             </form>

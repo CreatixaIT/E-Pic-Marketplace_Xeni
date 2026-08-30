@@ -1,15 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
+import { useDictionary } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const dict = useDictionary();
+  
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,14 +28,14 @@ export default function LoginPage() {
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email) {
-      newErrors.email = "Email is required";
+      newErrors.email = dict.auth.requiredField;
     } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Invalid email format";
+      newErrors.email = dict.auth.invalidEmail;
     }
 
     // Password validation
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = dict.auth.requiredField;
     }
 
     setErrors(newErrors);
@@ -55,15 +60,15 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setErrors({ form: "Invalid email or password" });
+        setErrors({ form: dict.auth.loginError });
         return;
       }
 
-      // Redirect to home on successful login
-      router.push("/");
+      // Redirect to callback URL or home on successful login
+      router.push(callbackUrl);
       router.refresh();
     } catch {
-      setErrors({ form: "An error occurred during login" });
+      setErrors({ form: dict.auth.loginError });
     } finally {
       setIsLoading(false);
     }
@@ -87,8 +92,8 @@ export default function LoginPage() {
       <Container>
         <div className="mx-auto max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">Welcome back</h1>
-            <p className="text-muted">Sign in to your account to continue</p>
+            <h1 className="text-3xl font-bold mb-2">{dict.auth.loginTitle}</h1>
+            <p className="text-muted">{dict.auth.loginDescription}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -100,7 +105,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium mb-2">
-                Email <span className="text-red-500">*</span>
+                {dict.auth.email} <span className="text-red-500">*</span>
               </label>
               <input
                 id="email"
@@ -108,7 +113,7 @@ export default function LoginPage() {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Enter your email"
+                placeholder={dict.auth.emailPlaceholder}
                 className={cn(
                   "w-full px-4 py-3 rounded-lg border bg-background",
                   "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
@@ -123,7 +128,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium mb-2">
-                Password <span className="text-red-500">*</span>
+                {dict.auth.password} <span className="text-red-500">*</span>
               </label>
               <input
                 id="password"
@@ -131,7 +136,7 @@ export default function LoginPage() {
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Enter your password"
+                placeholder={dict.auth.passwordPlaceholder}
                 className={cn(
                   "w-full px-4 py-3 rounded-lg border bg-background",
                   "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
@@ -149,16 +154,16 @@ export default function LoginPage() {
               disabled={isLoading}
               className="w-full"
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? dict.auth.signingIn : dict.auth.signIn}
             </Button>
 
             <p className="text-center text-sm text-muted">
-              Don&apos;t have an account?{" "}
+              {dict.auth.noAccount}{" "}
               <Link
                 href="/register"
                 className="text-accent hover:underline font-medium"
               >
-                Sign up
+                {dict.auth.signUp}
               </Link>
             </p>
           </form>
