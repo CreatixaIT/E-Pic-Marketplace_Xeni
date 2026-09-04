@@ -13,10 +13,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-
     // Build URL with session_id if present (for guest carts)
-    let url = `${GATEWAY_API_BASE_URL}/buyer/cart/items`;
+    let url = `${GATEWAY_API_BASE_URL}/buyer/cart/clear`;
     if (sessionID) {
       url += `?session_id=${sessionID}`;
     }
@@ -25,7 +23,6 @@ export async function POST(request: NextRequest) {
       "Content-Type": "application/json",
     };
 
-    // Add Authorization header only if we have a token (authenticated users)
     if (accessToken) {
       headers["Authorization"] = `Bearer ${accessToken}`;
     }
@@ -33,18 +30,17 @@ export async function POST(request: NextRequest) {
     const response = await fetch(url, {
       method: "POST",
       headers,
-      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: "Failed to sync cart" }));
+      const error = await response.json().catch(() => ({ error: "Failed to clear cart" }));
       return NextResponse.json(error, { status: response.status });
     }
 
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Cart sync error:", error);
-    return NextResponse.json({ error: "Failed to sync cart" }, { status: 500 });
+    console.error("Cart clear error:", error);
+    return NextResponse.json({ error: "Failed to clear cart" }, { status: 500 });
   }
 }

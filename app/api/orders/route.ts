@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 const GATEWAY_API_BASE_URL = process.env.XENI_API_BASE_URL || "http://localhost:8080/api";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("gateway_access_token")?.value;
@@ -12,17 +12,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const sellerId = searchParams.get("seller_id");
-
-    // Build query parameters
-    const url = new URL(`${GATEWAY_API_BASE_URL}/orders`);
-    if (sellerId) {
-      url.searchParams.set("seller_id", sellerId);
-    }
-
-    const response = await fetch(url.toString(), {
+    const response = await fetch(`${GATEWAY_API_BASE_URL}/buyer/orders`, {
+      method: "GET",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
     });

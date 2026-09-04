@@ -140,6 +140,7 @@ export type CartLine = {
   id: string;
   product: Product;
   quantity: number;
+  lineTotal: Money;
 };
 
 export type Cart = {
@@ -147,6 +148,37 @@ export type Cart = {
   lines: CartLine[];
   subtotal: Money;
   currency: Money["currency"];
+};
+
+export type Order = {
+  id: string;
+  storeId: string;
+  storeName: string;
+  customerName: string;
+  customerPhone: string;
+  customerAddress: string;
+  items: Array<{
+    productId: string;
+    productName: string;
+    quantity: number;
+    price: Money;
+    lineTotal: Money;
+  }>;
+  subtotal: Money;
+  deliveryCharge: Money;
+  total: Money;
+  paymentMethod: string;
+  paymentStatus: string;
+  deliveryStatus: string;
+  createdAt: string;
+};
+
+export type CheckoutRequest = {
+  customerName: string;
+  customerPhone: string;
+  customerAddress: string;
+  paymentMethod: string;
+  notes?: string;
 };
 
 /**
@@ -167,4 +199,13 @@ export interface CommerceProvider {
   getPromoSlides(): Promise<PromoSlide[]>;
   getCart(): Promise<Cart>;
   getProductBySlug(slug: string): Promise<Product | null>;
+  // Cart operations
+  addToCart(productId: string, quantity: number): Promise<Cart>;
+  updateCartItem(itemId: string, quantity: number): Promise<Cart>;
+  removeFromCart(itemId: string): Promise<Cart>;
+  clearCart(): Promise<void>;
+  // Checkout and orders
+  checkout(request: CheckoutRequest): Promise<Order[]>;
+  getOrders(): Promise<Order[]>;
+  getOrderById(orderId: string): Promise<Order | null>;
 }

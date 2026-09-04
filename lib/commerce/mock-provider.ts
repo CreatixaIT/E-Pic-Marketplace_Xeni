@@ -3,9 +3,11 @@ import type {
   CartLine,
   Category,
   CategoryId,
+  CheckoutRequest,
   CollectionId,
   CommerceProvider,
   Money,
+  Order,
   Product,
   PromoSlide,
   Store,
@@ -619,8 +621,8 @@ const promoSlides: PromoSlide[] = [
 ];
 
 const cartLines: CartLine[] = [
-  { id: "line_1", product: products[0], quantity: 1 },
-  { id: "line_2", product: products[5], quantity: 2 },
+  { id: "line_1", product: products[0], quantity: 1, lineTotal: { amount: products[0].price.amount, currency: "USD" } },
+  { id: "line_2", product: products[5], quantity: 2, lineTotal: { amount: products[5].price.amount * 2, currency: "USD" } },
 ];
 
 function subtotal(lines: CartLine[]): Money {
@@ -681,5 +683,82 @@ export const mockProvider: CommerceProvider = {
   },
   async getProductBySlug(slug: string): Promise<Product | null> {
     return products.find((product) => product.slug === slug) ?? null;
+  },
+  async addToCart(productId: string, quantity: number): Promise<Cart> {
+    // Mock implementation
+    const product = products.find((p) => p.id === productId);
+    if (!product) return { id: "cart_mock", lines: [], subtotal: { amount: 0, currency: "USD" }, currency: "USD" };
+    const existingLine = cartLines.find((l) => l.product.id === productId);
+    if (existingLine) {
+      existingLine.quantity += quantity;
+      existingLine.lineTotal = { amount: product.price.amount * existingLine.quantity, currency: "USD" };
+    } else {
+      cartLines.push({ id: `line_${Date.now()}`, product, quantity, lineTotal: { amount: product.price.amount * quantity, currency: "USD" } });
+    }
+    return {
+      id: "cart_mock",
+      lines: cartLines,
+      subtotal: subtotal(cartLines),
+      currency: "USD",
+    };
+  },
+  async updateCartItem(itemId: string, quantity: number): Promise<Cart> {
+    const line = cartLines.find((l) => l.id === itemId);
+    if (line) {
+      line.quantity = quantity;
+      line.lineTotal = { amount: line.product.price.amount * quantity, currency: "USD" };
+    }
+    return {
+      id: "cart_mock",
+      lines: cartLines,
+      subtotal: subtotal(cartLines),
+      currency: "USD",
+    };
+  },
+  async removeFromCart(itemId: string): Promise<Cart> {
+    const index = cartLines.findIndex((l) => l.id === itemId);
+    if (index >= 0) {
+      cartLines.splice(index, 1);
+    }
+    return {
+      id: "cart_mock",
+      lines: cartLines,
+      subtotal: subtotal(cartLines),
+      currency: "USD",
+    };
+  },
+  async clearCart(): Promise<void> {
+    cartLines.length = 0;
+  },
+  async checkout(request: CheckoutRequest): Promise<Order[]> {
+    // Mock implementation
+    return [{
+      id: `order_${Date.now()}`,
+      storeId: "str_mock",
+      storeName: "Mock Store",
+      customerName: request.customerName,
+      customerPhone: request.customerPhone,
+      customerAddress: request.customerAddress,
+      items: cartLines.map((line) => ({
+        productId: line.product.id,
+        productName: line.product.name,
+        quantity: line.quantity,
+        price: line.product.price,
+        lineTotal: { amount: line.product.price.amount * line.quantity, currency: "USD" },
+      })),
+      subtotal: subtotal(cartLines),
+      deliveryCharge: { amount: 0, currency: "USD" },
+      total: subtotal(cartLines),
+      paymentMethod: request.paymentMethod,
+      paymentStatus: "pending",
+      deliveryStatus: "pending",
+      createdAt: new Date().toISOString(),
+    }];
+  },
+  async getOrders(): Promise<Order[]> {
+    return [];
+  },
+  async getOrderById(_orderId: string): Promise<Order | null> {
+    return null;
   },
 };

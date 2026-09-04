@@ -14,7 +14,8 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const response = await fetch(`${GATEWAY_API_BASE_URL}/checkout`, {
+    // Use the new buyer checkout endpoint
+    const response = await fetch(`${GATEWAY_API_BASE_URL}/buyer/checkout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
