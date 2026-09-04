@@ -35,11 +35,7 @@ export function SellerDashboardClient({ userId }: { userId: string }) {
 
   const fetchShopData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/shops/me", {
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-      });
+      const response = await fetch("/api/shops/me");
 
       if (response.ok) {
         const data = await response.json();
@@ -55,18 +51,10 @@ export function SellerDashboardClient({ userId }: { userId: string }) {
   const fetchStats = async () => {
     try {
       // Fetch products count
-      const productsResponse = await fetch("http://localhost:8080/api/products", {
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-      });
+      const productsResponse = await fetch("/api/products");
 
       // Fetch orders count
-      const ordersResponse = await fetch("http://localhost:8080/api/orders", {
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-      });
+      const ordersResponse = await fetch("/api/orders");
 
       if (productsResponse.ok) {
         const productsData = await productsResponse.json();
@@ -80,16 +68,6 @@ export function SellerDashboardClient({ userId }: { userId: string }) {
     } catch (error) {
       console.error("Failed to fetch stats:", error);
     }
-  };
-
-  const getAccessToken = (): string => {
-    // Helper to get access token from cookies
-    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split("=");
-      acc[key] = value;
-      return acc;
-    }, {} as Record<string, string>);
-    return cookies.gateway_access_token || "";
   };
 
   const handleLogout = async () => {

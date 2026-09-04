@@ -25,15 +25,6 @@ export function CheckoutClient({ userId }: { userId: string }) {
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState("");
 
-  const getAccessToken = (): string => {
-    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split("=");
-      acc[key] = value;
-      return acc;
-    }, {} as Record<string, string>);
-    return cookies.gateway_access_token || "";
-  };
-
   const handleCheckout = async () => {
     if (!customerName || !customerPhone || !customerAddress) {
       alert("Please fill in all customer details");
@@ -47,11 +38,10 @@ export function CheckoutClient({ userId }: { userId: string }) {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/api/checkout", {
+      const response = await fetch("/api/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${getAccessToken()}`,
         },
         body: JSON.stringify({
           customer_name: customerName,

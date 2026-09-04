@@ -40,11 +40,7 @@ export function InventoryClient({ userId }: { userId: string }) {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/products", {
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-      });
+      const response = await fetch("/api/products");
 
       if (response.ok) {
         const data = await response.json();
@@ -59,11 +55,7 @@ export function InventoryClient({ userId }: { userId: string }) {
 
   const fetchInventoryHistory = async (productId: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/products/${productId}/inventory`, {
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-      });
+      const response = await fetch(`/api/products/${productId}/inventory`);
 
       if (response.ok) {
         const data = await response.json();
@@ -86,12 +78,11 @@ export function InventoryClient({ userId }: { userId: string }) {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/products/${selectedProduct.id}/${endpoint}`,
+        `/api/products/${selectedProduct.id}/${endpoint}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${getAccessToken()}`,
           },
           body: JSON.stringify({
             quantity: parseInt(quantity),
@@ -113,15 +104,6 @@ export function InventoryClient({ userId }: { userId: string }) {
       console.error("Failed to update stock:", error);
       alert("Failed to update stock");
     }
-  };
-
-  const getAccessToken = (): string => {
-    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split("=");
-      acc[key] = value;
-      return acc;
-    }, {} as Record<string, string>);
-    return cookies.gateway_access_token || "";
   };
 
   const handleProductSelect = (product: Product) => {

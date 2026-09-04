@@ -31,11 +31,7 @@ export function OrderDetailClient({ orderId, userId }: { orderId: string; userId
 
   const fetchOrder = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/orders/${orderId}`, {
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-      });
+      const response = await fetch(`/api/orders/${orderId}`);
 
       if (response.ok) {
         const data = await response.json();
@@ -48,23 +44,13 @@ export function OrderDetailClient({ orderId, userId }: { orderId: string; userId
     }
   };
 
-  const getAccessToken = (): string => {
-    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split("=");
-      acc[key] = value;
-      return acc;
-    }, {} as Record<string, string>);
-    return cookies.gateway_access_token || "";
-  };
-
   const handleUpdatePaymentStatus = async (status: string) => {
     setUpdating(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/orders/${orderId}`, {
+      const response = await fetch(`/api/orders/${orderId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${getAccessToken()}`,
         },
         body: JSON.stringify({ payment_status: status }),
       });

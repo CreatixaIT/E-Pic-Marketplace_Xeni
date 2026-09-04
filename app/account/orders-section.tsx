@@ -27,9 +27,9 @@ export function OrdersSection() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/orders", {
+      const response = await fetch("/api/orders", {
         headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
+          "Content-Type": "application/json",
         },
       });
 
@@ -42,15 +42,6 @@ export function OrdersSection() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const getAccessToken = (): string => {
-    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split("=");
-      acc[key] = value;
-      return acc;
-    }, {} as Record<string, string>);
-    return cookies.gateway_access_token || "";
   };
 
   if (loading) {

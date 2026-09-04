@@ -25,11 +25,7 @@ export function BuyerOrdersClient({ userId }: { userId: string }) {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/orders", {
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-      });
+      const response = await fetch("/api/orders");
 
       if (response.ok) {
         const data = await response.json();
@@ -40,15 +36,6 @@ export function BuyerOrdersClient({ userId }: { userId: string }) {
     } finally {
       setLoading(false);
     }
-  };
-
-  const getAccessToken = (): string => {
-    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split("=");
-      acc[key] = value;
-      return acc;
-    }, {} as Record<string, string>);
-    return cookies.gateway_access_token || "";
   };
 
   const handleViewOrder = (orderId: string) => {

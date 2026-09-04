@@ -30,11 +30,7 @@ export function BuyerOrderDetailClient({ orderId, userId }: { orderId: string; u
 
   const fetchOrder = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/orders/${orderId}`, {
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-      });
+      const response = await fetch(`/api/orders/${orderId}`);
 
       if (response.ok) {
         const data = await response.json();
@@ -45,15 +41,6 @@ export function BuyerOrderDetailClient({ orderId, userId }: { orderId: string; u
     } finally {
       setLoading(false);
     }
-  };
-
-  const getAccessToken = (): string => {
-    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split("=");
-      acc[key] = value;
-      return acc;
-    }, {} as Record<string, string>);
-    return cookies.gateway_access_token || "";
   };
 
   if (loading) {

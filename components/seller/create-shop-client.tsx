@@ -19,11 +19,10 @@ export function CreateShopClient({ userId }: { userId: string }) {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/api/shops", {
+      const response = await fetch("/api/shops", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${getAccessToken()}`,
         },
         body: JSON.stringify(formData),
       });
@@ -40,15 +39,6 @@ export function CreateShopClient({ userId }: { userId: string }) {
     } finally {
       setLoading(false);
     }
-  };
-
-  const getAccessToken = (): string => {
-    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split("=");
-      acc[key] = value;
-      return acc;
-    }, {} as Record<string, string>);
-    return cookies.gateway_access_token || "";
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

@@ -38,11 +38,7 @@ export function EditProductClient({ productId, userId }: { productId: string; us
 
   const fetchProduct = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/products/${productId}`, {
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-      });
+      const response = await fetch(`/api/products/${productId}`);
 
       if (response.ok) {
         const data = await response.json();
@@ -74,11 +70,8 @@ export function EditProductClient({ productId, userId }: { productId: string; us
     formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:8080/api/products/upload", {
+      const response = await fetch("/api/products/upload", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
         body: formData,
       });
 
@@ -108,11 +101,10 @@ export function EditProductClient({ productId, userId }: { productId: string; us
         images: imageUrl ? [imageUrl] : product?.images || [],
       };
 
-      const response = await fetch(`http://localhost:8080/api/products/${productId}`, {
+      const response = await fetch(`/api/products/${productId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${getAccessToken()}`,
         },
         body: JSON.stringify(payload),
       });
@@ -129,15 +121,6 @@ export function EditProductClient({ productId, userId }: { productId: string; us
     } finally {
       setSaving(false);
     }
-  };
-
-  const getAccessToken = (): string => {
-    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split("=");
-      acc[key] = value;
-      return acc;
-    }, {} as Record<string, string>);
-    return cookies.gateway_access_token || "";
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
