@@ -81,6 +81,12 @@ type XeniStore = {
   preferred_language?: string;
 };
 
+type XeniStoreDetail = {
+  store: XeniStore;
+  products: XeniProduct[];
+  product_count: number;
+};
+
 type XeniCategory = {
   id: string;
   slug: string;
@@ -328,8 +334,9 @@ export const xeniProvider: CommerceProvider = {
 
   async getStores(): Promise<Store[]> {
     try {
-      const xeniStores = await fetchFromXeni<XeniStore[]>("/stores");
-      return xeniStores.map(store => mapXeniStoreToEpic(store));
+      const response = await fetchFromXeni<{ data: XeniStore[]; meta: { page: number; per_page: number; total: number; total_pages: number } }>("/stores?per_page=100");
+      const stores = response.data || [];
+      return stores.map(store => mapXeniStoreToEpic(store));
     } catch {
       console.error("Failed to fetch stores from Xeni, returning empty array");
       return [];
@@ -349,8 +356,8 @@ export const xeniProvider: CommerceProvider = {
 
   async getStoreBySlug(slug: string): Promise<Store | null> {
     try {
-      const xeniStore = await fetchFromXeni<XeniStore>(`/stores/${slug}`);
-      return mapXeniStoreToEpic(xeniStore);
+      const xeniStoreDetail = await fetchFromXeni<XeniStoreDetail>(`/stores/${slug}`);
+      return mapXeniStoreToEpic(xeniStoreDetail.store, xeniStoreDetail.product_count);
     } catch {
       console.error(`Failed to fetch store ${slug} from Xeni`);
       return null;
@@ -363,8 +370,8 @@ export const xeniProvider: CommerceProvider = {
 
   async getProducts(): Promise<Product[]> {
     try {
-      const response = await fetchFromXeni<{ data: XeniProduct[]; meta: { page: number; per_page: number; total: number; total_pages: number } }>("/products?per_page=100");
-      const products = response.data || [];
+      const response = await fetchFromXeni<XeniProduct[]>("/products?per_page=100");
+      const products = response || [];
       return products.map(mapXeniProductToEpic);
     } catch {
       console.error("Failed to fetch products from Xeni, returning empty array");
@@ -374,8 +381,8 @@ export const xeniProvider: CommerceProvider = {
 
   async getProductsByStore(storeId: string): Promise<Product[]> {
     try {
-      const response = await fetchFromXeni<{ data: XeniProduct[]; meta: { page: number; per_page: number; total: number; total_pages: number } }>(`/products?store_id=${storeId}&per_page=100`);
-      const products = response.data || [];
+      const response = await fetchFromXeni<XeniProduct[]>(`/products?store_id=${storeId}&per_page=100`);
+      const products = response || [];
       return products.map(mapXeniProductToEpic);
     } catch {
       console.error(`Failed to fetch products for store ${storeId} from Xeni, returning empty array`);
@@ -394,8 +401,8 @@ export const xeniProvider: CommerceProvider = {
         lifestyle: "lifestyle",
       };
       const slug = categoryToSlug[category];
-      const response = await fetchFromXeni<{ data: XeniProduct[]; meta: { page: number; per_page: number; total: number; total_pages: number } }>(`/products?category=${slug}&per_page=100`);
-      const products = response.data || [];
+      const response = await fetchFromXeni<XeniProduct[]>(`/products?category=${slug}&per_page=100`);
+      const products = response || [];
       return products.map(mapXeniProductToEpic);
     } catch {
       console.error(`Failed to fetch products for category ${category} from Xeni, returning empty array`);
