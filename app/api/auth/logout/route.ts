@@ -4,7 +4,7 @@ import { cookies } from "next/headers"
 
 const GATEWAY_AUTH_API_BASE_URL = process.env.XENI_AUTH_API_BASE_URL || "http://localhost:8080/api/auth"
 
-export async function POST(request: Request) {
+export async function POST(_request: Request) {
   try {
     const cookieStore = await cookies()
     const accessToken = cookieStore.get("gateway_access_token")?.value

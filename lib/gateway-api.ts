@@ -5,28 +5,19 @@ const GATEWAY_AUTH_API_BASE_URL = process.env.XENI_AUTH_API_BASE_URL || "http://
 
 /**
  * Gateway API client for making authenticated requests
+ * This client must only be used server-side to access HttpOnly cookies
  */
 export class GatewayApiClient {
   private async getAccessToken(): Promise<string | null> {
-    if (typeof window !== "undefined") {
-      // Client-side: read from document.cookie
-      const match = document.cookie.match(/(^|;\s*)gateway_access_token=([^;]*)/)
-      return match ? match[2] : null
-    } else {
-      // Server-side: read from Next.js cookies
-      const cookieStore = await cookies()
-      return cookieStore.get("gateway_access_token")?.value || null
-    }
+    // Server-side only: read from Next.js cookies
+    const cookieStore = await cookies()
+    return cookieStore.get("gateway_access_token")?.value || null
   }
 
   private async getRefreshToken(): Promise<string | null> {
-    if (typeof window !== "undefined") {
-      const match = document.cookie.match(/(^|;\s*)gateway_refresh_token=([^;]*)/)
-      return match ? match[2] : null
-    } else {
-      const cookieStore = await cookies()
-      return cookieStore.get("gateway_refresh_token")?.value || null
-    }
+    // Server-side only: read from Next.js cookies
+    const cookieStore = await cookies()
+    return cookieStore.get("gateway_refresh_token")?.value || null
   }
 
   private async refreshAccessToken(): Promise<string | null> {
@@ -46,27 +37,22 @@ export class GatewayApiClient {
 
       const data = await response.json()
 
-      // Update tokens in cookies
-      if (typeof window !== "undefined") {
-        document.cookie = `gateway_access_token=${data.data.access_token}; path=/; max-age=900; SameSite=Lax${process.env.NODE_ENV === "production" ? "; Secure" : ""}`
-        document.cookie = `gateway_refresh_token=${data.data.refresh_token}; path=/; max-age=604800; SameSite=Lax${process.env.NODE_ENV === "production" ? "; Secure" : ""}`
-      } else {
-        const cookieStore = await cookies()
-        cookieStore.set("gateway_access_token", data.data.access_token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 15 * 60,
-          path: "/",
-        })
-        cookieStore.set("gateway_refresh_token", data.data.refresh_token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 7 * 24 * 60 * 60,
-          path: "/",
-        })
-      }
+      // Update tokens in HttpOnly cookies (server-side only)
+      const cookieStore = await cookies()
+      cookieStore.set("gateway_access_token", data.data.access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 15 * 60,
+        path: "/",
+      })
+      cookieStore.set("gateway_refresh_token", data.data.refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60,
+        path: "/",
+      })
 
       return data.data.access_token
     } catch (error) {
@@ -114,7 +100,7 @@ export class GatewayApiClient {
     return response.json()
   }
 
-  async post<T>(endpoint: string, data: any): Promise<T> {
+  async post<T>(endpoint: string, data: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: "POST",
       body: JSON.stringify(data),
@@ -127,7 +113,7 @@ export class GatewayApiClient {
     })
   }
 
-  async put<T>(endpoint: string, data: any): Promise<T> {
+  async put<T>(endpoint: string, data: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: "PUT",
       body: JSON.stringify(data),

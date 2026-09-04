@@ -39,6 +39,17 @@
 - Update frontend role checks
 - Test role-based authorization
 
+**Phase 3.2: Google OAuth Handoff Integration (2026-09-XX)**
+- Integrate secure Xeni Google OAuth handoff mechanism
+- Create `/api/auth/exchange-handoff` route to exchange one-time handoff code for tokens
+- Create `/auth/callback` client page to handle hash fragment from Xeni redirect
+- Update login page to redirect to Xeni Google OAuth endpoint
+- Update NextAuth credentials provider to handle OAuth handoff flow
+- Remove client-side token exposure from gateway-api.ts
+- Store Xeni tokens only in HttpOnly cookies
+- Ensure no tokens appear in URLs, localStorage, or sessionStorage
+- Test complete Google OAuth flow
+
 **Phase 4: Feature Parity**
 - Implement Gateway features in frontend (2FA, email verification)
 - Update UI to support Gateway authentication features

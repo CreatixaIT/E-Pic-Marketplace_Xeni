@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { useDictionary } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
+const GATEWAY_AUTH_API_BASE_URL = process.env.NEXT_PUBLIC_XENI_AUTH_API_BASE_URL || "http://localhost:8080/api/auth";
+
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -72,6 +74,11 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleLogin = () => {
+    // Redirect to Xeni Google OAuth
+    router.push(`${GATEWAY_AUTH_API_BASE_URL}/google/login`);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,6 +162,24 @@ export default function LoginPage() {
               className="w-full"
             >
               {isLoading ? dict.auth.signingIn : dict.auth.signIn}
+            </Button>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleGoogleLogin}
+              className="w-full"
+            >
+              Continue with Google
             </Button>
 
             <p className="text-center text-sm text-muted">

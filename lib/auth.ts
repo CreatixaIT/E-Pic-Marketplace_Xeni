@@ -2,7 +2,7 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { cookies } from "next/headers"
 
-const GATEWAY_AUTH_URL = process.env.XENI_AUTH_API_BASE_URL || "http://localhost:8080/api/auth"
+const GATEWAY_AUTH_API_BASE_URL = process.env.XENI_AUTH_API_BASE_URL || "http://localhost:8080/api/auth"
 
 // Map Gateway roles to frontend roles
 function mapGatewayRoleToFrontendRole(gatewayRole: string): string {
@@ -32,9 +32,49 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null
         }
 
+        // Handle OAuth handoff - tokens already set by exchange-handoff route
+        if (credentials.password === "oauth-handoff") {
+          const cookieStore = await cookies()
+          const accessToken = cookieStore.get("gateway_access_token")?.value
+
+          if (!accessToken) {
+            console.error("OAuth handoff: missing access token")
+            return null
+          }
+
+          // For OAuth handoff, we only have email from the exchange response
+          // We need to fetch user details from Gateway to get role and name
+          try {
+            const GATEWAY_API_BASE_URL = process.env.XENI_API_BASE_URL || "http://localhost:8080/api/public/v1"
+            const response = await fetch(`${GATEWAY_API_BASE_URL}/user/me`, {
+              headers: {
+                "Authorization": `Bearer ${accessToken}`,
+              },
+            })
+
+            if (!response.ok) {
+              console.error("OAuth handoff: failed to fetch user details")
+              return null
+            }
+
+            const userData = await response.json()
+
+            return {
+              id: userData.data.id,
+              email: userData.data.email,
+              name: userData.data.full_name,
+              role: userData.data.role,
+            }
+          } catch (error) {
+            console.error("OAuth handoff error:", error)
+            return null
+          }
+        }
+
+        // Regular password-based login
         try {
           // Call Gateway login API
-          const response = await fetch(`${GATEWAY_AUTH_URL}/login`, {
+          const response = await fetch(`${GATEWAY_AUTH_API_BASE_URL}/login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
