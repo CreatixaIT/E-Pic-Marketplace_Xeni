@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/db"
-import bcrypt from "bcryptjs"
+
+const GATEWAY_AUTH_API_BASE_URL = process.env.XENI_AUTH_API_BASE_URL || "http://localhost:8080/api/auth"
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { email, password, name } = body
+    const { email, password, full_name, language } = body
 
     // Validate input
-    if (!email || !password) {
+    if (!email || !password || !full_name) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { error: "Email, password, and full name are required" },
         { status: 400 }
       )
     }
@@ -32,50 +32,37 @@ export async function POST(request: Request) {
       )
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
+    // Call Gateway registration API
+    const response = await fetch(`${GATEWAY_AUTH_API_BASE_URL}/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email.toLowerCase(),
+        password,
+        full_name,
+        language: language || "en",
+      }),
     })
 
-    if (existingUser) {
+    if (!response.ok) {
+      const error = await response.json()
       return NextResponse.json(
-        { error: "Email already registered" },
-        { status: 409 }
+        { error: error.message || "Registration failed" },
+        { status: response.status }
       )
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12)
-
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        email: email.toLowerCase(),
-        password: hashedPassword,
-        name: name || null,
-        role: "BUYER",
-        status: "ACTIVE",
-      },
-    })
-
-    // Create profile if name provided
-    if (name) {
-      await prisma.profile.create({
-        data: {
-          userId: user.id,
-          fullName: name,
-        },
-      })
-    }
+    const data = await response.json()
 
     return NextResponse.json(
-      { 
-        message: "User created successfully",
+      {
+        message: "Registration successful. Please verify your email.",
         user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        }
+          id: data.data.user_id,
+          email: data.data.email,
+        },
       },
       { status: 201 }
     )

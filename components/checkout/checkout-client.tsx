@@ -1,122 +1,214 @@
 "use client";
 
-import { useCart } from "@/lib/cart";
-import { useCheckout } from "@/lib/checkout";
-import { ButtonLink } from "@/components/ui/button";
-import type { Dictionary } from "@/lib/i18n/types";
-import { CustomerDetailsForm } from "./customer-details-form";
-import { DeliveryAddressForm } from "./delivery-address-form";
-import { PaymentMethodForm } from "./payment-method-form";
-import { OrderReview } from "./order-review";
-import { OrderConfirmation } from "./order-confirmation";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Section } from "@/components/ui/section";
+import { Container } from "@/components/ui/container";
+import { ShoppingCart, ArrowLeft, Check } from "lucide-react";
+import { useCart } from "@/lib/cart/provider";
 
-export function CheckoutClient({ dictionary }: { dictionary: Dictionary }) {
-  const { items, storeName, subtotal, currency } = useCart();
-  const { step } = useCheckout();
+type CartItem = {
+  productId: string;
+  product: any;
+  quantity: number;
+};
 
-  // Handle empty cart
-  if (items.length === 0) {
-    return (
-      <div className="rounded-3xl border border-border bg-surface p-12 text-center">
-        <p className="text-lg font-medium">{dictionary.checkout.emptyCart}</p>
-        <p className="mt-2 text-sm text-muted">
-          {dictionary.checkout.emptyCartDescription}
-        </p>
-        <div className="mt-8 flex justify-center">
-          <ButtonLink href="/explore">{dictionary.checkout.keepShopping}</ButtonLink>
-        </div>
-      </div>
-    );
-  }
+export function CheckoutClient({ userId }: { userId: string }) {
+  const router = useRouter();
+  const { items, subtotal, clearCart } = useCart();
+  const [loading, setLoading] = useState(false);
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [orderComplete, setOrderComplete] = useState(false);
+  const [orderId, setOrderId] = useState("");
 
-  // Render appropriate step
-  const renderStep = () => {
-    switch (step) {
-      case "customer-details":
-        return <CustomerDetailsForm dictionary={dictionary} />;
-      case "delivery-address":
-        return <DeliveryAddressForm dictionary={dictionary} />;
-      case "payment-method":
-        return <PaymentMethodForm dictionary={dictionary} />;
-      case "order-review":
-        return <OrderReview dictionary={dictionary} />;
-      case "confirmation":
-        return <OrderConfirmation dictionary={dictionary} />;
-      default:
-        return <CustomerDetailsForm dictionary={dictionary} />;
+  const getAccessToken = (): string => {
+    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
+      const [key, value] = cookie.trim().split("=");
+      acc[key] = value;
+      return acc;
+    }, {} as Record<string, string>);
+    return cookies.gateway_access_token || "";
+  };
+
+  const handleCheckout = async () => {
+    if (!customerName || !customerPhone || !customerAddress) {
+      alert("Please fill in all customer details");
+      return;
+    }
+
+    if (items.length === 0) {
+      alert("Your cart is empty");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:8080/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+        body: JSON.stringify({
+          customer_name: customerName,
+          customer_phone: customerPhone,
+          customer_address: customerAddress,
+          payment_method: paymentMethod,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setOrderId(data.data.id);
+        setOrderComplete(true);
+        clearCart();
+      } else {
+        const error = await response.json();
+        alert(error.error || "Checkout failed");
+      }
+    } catch (error) {
+      console.error("Checkout failed:", error);
+      alert("Checkout failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
-      {/* Main checkout content */}
-      <div>
-        {/* Store Identity */}
-        {storeName && (
-          <div className="mb-6 rounded-xl border border-border bg-background/60 p-4">
-            <p className="text-sm text-muted">Shopping from</p>
-            <p className="mt-1 font-medium">{storeName}</p>
-          </div>
-        )}
-
-        {/* Step content */}
-        {renderStep()}
-      </div>
-
-      {/* Order Summary Sidebar */}
-      {step !== "confirmation" && (
-        <aside className="h-fit rounded-3xl border border-border bg-surface p-6 lg:sticky lg:top-8">
-          <h2 className="text-sm font-semibold tracking-wide uppercase">
-            {dictionary.checkout.orderReview.orderSummary}
-          </h2>
-          
-          {/* Cart items preview */}
-          <div className="mt-5 space-y-4">
-            {items.slice(0, 3).map((item) => (
-              <div key={item.productId} className="flex items-center gap-3">
-                <div
-                  role="img"
-                  aria-label={item.product.image.alt}
-                  className={`size-12 shrink-0 rounded-lg bg-gradient-to-br ${item.product.image.gradient}`}
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{item.product.name}</p>
-                  <p className="text-xs text-muted">Qty: {item.quantity}</p>
-                </div>
-                <p className="text-sm font-semibold">
-                  {item.product.price.currency === "USD" ? "$" : ""}{(item.product.price.amount * item.quantity / 100).toFixed(2)}
-                </p>
+  if (orderComplete) {
+    return (
+      <Container>
+        <Section>
+          <div className="max-w-md mx-auto border rounded-3xl p-8 text-center">
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
+                <Check className="h-8 w-8 text-green-600" />
               </div>
-            ))}
-            
-            {items.length > 3 && (
-              <p className="text-sm text-muted">
-                +{items.length - 3} more {dictionary.checkout.orderReview.items}
-              </p>
+            </div>
+            <h2 className="text-2xl font-bold mb-4">Order Placed Successfully!</h2>
+            <p className="text-muted mb-2">Your order has been placed successfully.</p>
+            <p className="text-sm text-muted mb-6">Order ID: {orderId.slice(0, 8)}...</p>
+            <div className="space-y-3">
+              <Button onClick={() => router.push("/account/orders")} className="w-full">
+                View My Orders
+              </Button>
+              <Button variant="secondary" onClick={() => router.push("/")} className="w-full">
+                Continue Shopping
+              </Button>
+            </div>
+          </div>
+        </Section>
+      </Container>
+    );
+  }
+
+  return (
+    <Container>
+      <Section>
+        <Button variant="secondary" onClick={() => router.back()} className="mb-6">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Cart
+        </Button>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="border rounded-3xl p-6">
+            <h2 className="text-xl font-semibold mb-4">Customer Information</h2>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium mb-2">Full Name</label>
+                <input
+                  id="name"
+                  type="text"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="Enter your full name"
+                  className="w-full p-3 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium mb-2">Phone Number</label>
+                <input
+                  id="phone"
+                  type="text"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  placeholder="Enter your phone number"
+                  className="w-full p-3 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium mb-2">Delivery Address</label>
+                <input
+                  id="address"
+                  type="text"
+                  value={customerAddress}
+                  onChange={(e) => setCustomerAddress(e.target.value)}
+                  placeholder="Enter your delivery address"
+                  className="w-full p-3 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label htmlFor="payment" className="block text-sm font-medium mb-2">Payment Method</label>
+                <select
+                  id="payment"
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="w-full p-3 border rounded-lg"
+                >
+                  <option value="cod">Cash on Delivery</option>
+                  <option value="bkash">bKash</option>
+                  <option value="nagad">Nagad</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="border rounded-3xl p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <ShoppingCart className="h-5 w-5 mr-2" />
+              Order Summary
+            </h2>
+            {items.length === 0 ? (
+              <p className="text-center text-muted py-8">Your cart is empty</p>
+            ) : (
+              <div className="space-y-4">
+                {items.map((item) => (
+                  <div key={item.productId} className="flex justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium">{item.product.name}</p>
+                      <p className="text-sm text-muted">Qty: {item.quantity}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">
+                        ${(item.product.price.amount * item.quantity).toFixed(2)}
+                      </p>
+                      <p className="text-sm text-muted">
+                        ${item.product.price.amount.toFixed(2)} each
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                <div className="border-t pt-4">
+                  <div className="flex justify-between font-semibold">
+                    <span>Total</span>
+                    <span>${subtotal.toFixed(2)}</span>
+                  </div>
+                </div>
+                <Button
+                  onClick={handleCheckout}
+                  disabled={loading || items.length === 0}
+                  className="w-full"
+                >
+                  {loading ? "Processing..." : "Place Order"}
+                </Button>
+              </div>
             )}
           </div>
-
-          {/* Price breakdown */}
-          <dl className="mt-6 space-y-3 text-sm border-t border-border pt-4">
-            <div className="flex justify-between">
-              <dt className="text-muted">{dictionary.checkout.orderReview.subtotal}</dt>
-              <dd>{currency === "USD" ? "$" : ""}{(subtotal / 100).toFixed(2)}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-muted">{dictionary.checkout.orderReview.shipping}</dt>
-              <dd className="text-muted">{dictionary.checkout.orderReview.shippingPlaceholder}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-muted">{dictionary.checkout.orderReview.taxes}</dt>
-              <dd className="text-muted">{dictionary.checkout.orderReview.taxesPlaceholder}</dd>
-            </div>
-            <div className="flex justify-between border-t border-border pt-3 text-base font-semibold">
-              <dt>{dictionary.checkout.orderReview.total}</dt>
-              <dd>{currency === "USD" ? "$" : ""}{(subtotal / 100).toFixed(2)}</dd>
-            </div>
-          </dl>
-        </aside>
-      )}
-    </div>
+        </div>
+      </Section>
+    </Container>
   );
 }

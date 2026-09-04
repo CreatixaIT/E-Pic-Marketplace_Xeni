@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useDictionary } from "@/lib/i18n/client";
-import { Package, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Eye, Package } from "lucide-react";
 
 type Order = {
   id: string;
@@ -15,15 +14,14 @@ type Order = {
   created_at: string;
 };
 
-export function OrdersSection() {
-  const dict = useDictionary();
+export function BuyerOrdersClient({ userId }: { userId: string }) {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [userId]);
 
   const fetchOrders = async () => {
     try {
@@ -53,30 +51,27 @@ export function OrdersSection() {
     return cookies.gateway_access_token || "";
   };
 
+  const handleViewOrder = (orderId: string) => {
+    router.push(`/account/orders/${orderId}`);
+  };
+
   if (loading) {
     return (
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold">{dict.account.orderHistory}</h2>
-        <div className="text-center py-12">
-          <div className="text-lg">Loading...</div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">{dict.account.orderHistory}</h2>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">My Orders</h1>
 
       {orders.length === 0 ? (
-        <div className="text-center py-12 px-4">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
-            <Package className="size-8 text-muted" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">{dict.account.noOrders}</h3>
-          <p className="text-muted max-w-md mx-auto">
-            {dict.account.noOrdersDescription}
-          </p>
+        <div className="text-center py-12">
+          <Package className="h-16 w-16 mx-auto text-muted mb-4" />
+          <h2 className="text-xl font-semibold mb-2">No orders yet</h2>
+          <p className="text-muted">Your order history will appear here</p>
         </div>
       ) : (
         <div className="border rounded-lg overflow-hidden">
@@ -123,7 +118,7 @@ export function OrdersSection() {
                     <Button
                       size="sm"
                       variant="secondary"
-                      onClick={() => router.push(`/account/orders/${order.id}`)}
+                      onClick={() => handleViewOrder(order.id)}
                     >
                       <Eye className="h-4 w-4 mr-2" />
                       View

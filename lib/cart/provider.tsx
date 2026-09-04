@@ -13,6 +13,15 @@ import {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+function getAccessToken(): string {
+  const cookies = document.cookie.split(";").reduce((acc, cookie) => {
+    const [key, value] = cookie.trim().split("=");
+    acc[key] = value;
+    return acc;
+  }, {} as Record<string, string>);
+  return cookies.gateway_access_token || "";
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartState>(() => loadCartFromStorage());
 
@@ -35,6 +44,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Check if this would be a cross-store checkout
     if (cart.storeId && cart.storeId !== product.storeId) {
       return false; // Signal that cross-store checkout was attempted
+    }
+
+    // Sync with backend cart
+    try {
+      const response = await fetch("http://localhost:8080/api/cart/items", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+        body: JSON.stringify({
+          product_id: product.id,
+          quantity,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Update local cart with backend response
+        // For now, keep local cart for immediate UI updates
+      }
+    } catch (error) {
+      console.error("Failed to sync cart with backend:", error);
     }
 
     setCart((prev) => {

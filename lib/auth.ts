@@ -1,11 +1,21 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from "@/lib/db"
-import bcrypt from "bcryptjs"
+import { cookies } from "next/headers"
+
+const GATEWAY_AUTH_URL = process.env.XENI_AUTH_API_BASE_URL || "http://localhost:8080/api/auth"
+
+// Map Gateway roles to frontend roles
+function mapGatewayRoleToFrontendRole(gatewayRole: string): string {
+  const roleMap: Record<string, string> = {
+    "user": "BUYER",
+    "seller": "SELLER",
+    "admin": "ADMIN",
+    "super_admin": "ADMIN",
+  }
+  return roleMap[gatewayRole] || "BUYER"
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
@@ -22,28 +32,54 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        })
+        try {
+          // Call Gateway login API
+          const response = await fetch(`${GATEWAY_AUTH_URL}/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
+          })
 
-        if (!user || !user.password) {
+          if (!response.ok) {
+            const error = await response.json()
+            console.error("Gateway login error:", error)
+            return null
+          }
+
+          const data = await response.json()
+
+          // Store tokens in HTTP-only cookies for API calls
+          const cookieStore = await cookies()
+          cookieStore.set("gateway_access_token", data.data.access_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 15 * 60, // 15 minutes
+            path: "/",
+          })
+          cookieStore.set("gateway_refresh_token", data.data.refresh_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 7 * 24 * 60 * 60, // 7 days
+            path: "/",
+          })
+
+          // Return user data for NextAuth session
+          return {
+            id: data.data.user.id,
+            email: data.data.user.email,
+            name: data.data.user.full_name,
+            role: data.data.user.role,
+          }
+        } catch (error) {
+          console.error("Gateway login error:", error)
           return null
-        }
-
-        const isValid = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        )
-
-        if (!isValid) {
-          return null
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
         }
       },
     }),
@@ -56,8 +92,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token.name && session.user) {
         session.user.name = token.name as string
       }
-      if (token.picture && session.user) {
-        session.user.image = token.picture as string
+      if (token.email && session.user) {
+        session.user.email = token.email as string
+      }
+      if (token.role && session.user) {
+        // Map Gateway roles to frontend roles
+        const gatewayRole = token.role as string
+        session.user.role = mapGatewayRoleToFrontendRole(gatewayRole)
       }
       return session
     },
@@ -65,7 +106,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.sub = user.id
         token.name = user.name
-        token.picture = user.image
+        token.email = user.email
+        token.role = user.role
       }
       return token
     },

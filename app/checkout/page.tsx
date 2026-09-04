@@ -1,28 +1,19 @@
 import type { Metadata } from "next";
-import { PageHeader } from "@/components/layout/page-header";
-import { Section } from "@/components/ui/section";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { CheckoutClient } from "@/components/checkout/checkout-client";
-import { getPreferences } from "@/lib/preferences/server";
 
 export const metadata: Metadata = {
   title: "Checkout",
-  description: "Complete your order on E-pic.",
+  description: "Complete your purchase",
 };
 
 export default async function CheckoutPage() {
-  const { dictionary } = await getPreferences();
+  const session = await auth();
 
-  return (
-    <>
-      <PageHeader
-        eyebrow="Checkout"
-        title={dictionary.checkout.title}
-        description="Fast. Clear. Trustworthy."
-      />
+  if (!session?.user) {
+    redirect("/login");
+  }
 
-      <Section>
-        <CheckoutClient dictionary={dictionary} />
-      </Section>
-    </>
-  );
+  return <CheckoutClient userId={session.user.id} />;
 }
