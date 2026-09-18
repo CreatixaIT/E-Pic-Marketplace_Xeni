@@ -9,7 +9,7 @@ import { Section, SectionHeading } from "@/components/ui/section";
 export const metadata: Metadata = {
   title: "Open your store",
   description:
-    "Open a branded storefront on E-pic. Seller onboarding arrives with Xeni.",
+    "Open a branded storefront on E-pic. Start selling today with Xeni-powered commerce.",
 };
 
 const benefits: SellerBenefit[] = [
@@ -64,14 +64,14 @@ export default function SellerPage() {
       <PageHeader
         eyebrow="Sell on E-pic"
         title="Your products deserve their own world"
-        description="E-pic hosts storefronts that look like the brands behind them. Applications open when seller onboarding connects — this page is the front door."
+        description="E-pic hosts storefronts that look like the brands behind them. Start selling today with Xeni-powered commerce."
       >
         <div className="flex flex-wrap gap-3">
-          <ButtonLink href="/explore" size="lg">
-            See existing storefronts
+          <ButtonLink href="/login?callbackUrl=/seller/dashboard" size="lg">
+            Sell Your Product
           </ButtonLink>
-          <ButtonLink href="/about" size="lg" variant="secondary">
-            Read about E-pic
+          <ButtonLink href="/explore" size="lg" variant="secondary">
+            See existing storefronts
           </ButtonLink>
         </div>
       </PageHeader>
@@ -124,8 +124,8 @@ export default function SellerPage() {
         </ol>
 
         <p className="mt-10 rounded-2xl border border-border bg-background/60 p-5 text-sm leading-relaxed text-muted">
-          Seller onboarding, verification and payouts will be handled by the
-          commerce system. No application form is collected in this preview.
+          Seller authentication, product management, and order processing are
+          powered by Xeni commerce system. Click "Sell Your Product" to get started.
         </p>
       </Section>
     </>
