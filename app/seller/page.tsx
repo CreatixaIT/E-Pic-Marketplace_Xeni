@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { 
   BadgeCheck, 
   LayoutTemplate, 
@@ -91,12 +92,12 @@ export default function SellerPage() {
         description="Xeni is your AI-powered seller operating system. Manage your complete online business from one place and sell on E-Pic marketplace."
       >
         <div className="flex flex-wrap gap-3">
-          <a
-            href="https://xeni.xentroinfotech.com/en/login"
+          <Link
+            href="/xeni"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-7 py-3 text-base font-medium text-white transition-colors hover:from-blue-700 hover:to-purple-700"
           >
             OPEN YOUR SMART SHOP WITH XENI
-          </a>
+          </Link>
           <ButtonLink href="/explore" size="lg" variant="secondary">
             Explore existing stores
           </ButtonLink>
