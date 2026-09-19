@@ -7,6 +7,7 @@ import type { LucideIcon } from "lucide-react";
 export type Route =
   | "/"
   | "/explore"
+  | "/stores"
   | "/cart"
   | "/seller"
   | "/about"

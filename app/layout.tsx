@@ -25,9 +25,30 @@ export const metadata: Metadata = {
     template: `%s — ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  keywords: ['marketplace', 'e-commerce', 'online shopping', 'SME', 'Bangladesh', 'Asia', 'seller platform'],
+  authors: [{ name: 'E-Pic' }],
+  creator: 'E-Pic',
+  publisher: 'E-Pic',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.name,
+    description: siteConfig.description,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { theme, locale, dir, dictionary } = await getPreferences();
 
   return (

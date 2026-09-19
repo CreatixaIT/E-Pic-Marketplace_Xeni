@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { MinimalTemplate, EditorialTemplate, ImmersiveTemplate } from "@/components/stores/templates";
+import { MinimalTemplate, LuxuryTemplate, ColorfulTemplate, EditorialTemplate, ImmersiveTemplate } from "@/components/stores/templates";
 import { getCommerceProvider } from "@/lib/commerce";
 import { getPreferences } from "@/lib/preferences/server";
 
@@ -33,6 +33,24 @@ export default async function StorePage({ params }: PageProps<"/stores/[slug]">)
     case "minimal":
       return (
         <MinimalTemplate
+          store={store}
+          products={products}
+          dictionary={dictionary}
+          locale={locale}
+        />
+      );
+    case "luxury":
+      return (
+        <LuxuryTemplate
+          store={store}
+          products={products}
+          dictionary={dictionary}
+          locale={locale}
+        />
+      );
+    case "colorful":
+      return (
+        <ColorfulTemplate
           store={store}
           products={products}
           dictionary={dictionary}

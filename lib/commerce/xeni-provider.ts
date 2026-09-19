@@ -77,11 +77,13 @@ type XeniProduct = {
 
 type XeniStore = {
   id: string;
+  shop_slug?: string;
   shop_name: string;
   shop_description?: string;
   shop_logo_url?: string;
   district?: string;
   preferred_language?: string;
+  store_theme: string;
 };
 
 type XeniStoreDetail = {
@@ -229,9 +231,17 @@ function mapXeniStoreToEpic(xeniStore: XeniStore, productCount: number = 0): Sto
   const gradient = generateGradientForStore(xeniStore.shop_name);
   const pattern = generatePatternForStore(xeniStore.shop_name);
 
+  // Use shop_slug if available, otherwise use ID
+  const slug = xeniStore.shop_slug || xeniStore.id;
+
+  // Map Xeni theme to E-Pic visual template
+  const themeTemplate = xeniStore.store_theme === "luxury" ? "luxury" 
+                       : xeniStore.store_theme === "colorful" ? "colorful" 
+                       : "minimal";
+
   return {
     id: xeniStore.id,
-    slug: xeniStore.id, // Using UUID as slug for now
+    slug: slug,
     name: xeniStore.shop_name,
     tagline: xeniStore.shop_description || "",
     description: xeniStore.shop_description || "",
@@ -251,7 +261,7 @@ function mapXeniStoreToEpic(xeniStore: XeniStore, productCount: number = 0): Sto
       accentText: "text-foreground",
     },
     visualConfig: {
-      template: "minimal",
+      template: themeTemplate,
       hero: {
         title: xeniStore.shop_name,
         description: xeniStore.shop_description,
@@ -261,7 +271,7 @@ function mapXeniStoreToEpic(xeniStore: XeniStore, productCount: number = 0): Sto
         content: xeniStore.shop_description || "",
       },
       visual: {
-        ambientMotion: false,
+        ambientMotion: xeniStore.store_theme === "luxury" || xeniStore.store_theme === "colorful",
         density: "comfortable",
       },
     },
@@ -455,6 +465,39 @@ export const xeniProvider: CommerceProvider = {
       return products.map(mapXeniProductToEpic);
     } catch {
       console.error("Failed to fetch products from Xeni, returning empty array");
+      return [];
+    }
+  },
+
+  async getFeaturedProducts(): Promise<Product[]> {
+    try {
+      const response = await fetchFromXeni<XeniProduct[]>("/products/featured?per_page=12");
+      const products = response || [];
+      return products.map(mapXeniProductToEpic);
+    } catch {
+      console.error("Failed to fetch featured products from Xeni, returning empty array");
+      return [];
+    }
+  },
+
+  async getBestSellingProducts(): Promise<Product[]> {
+    try {
+      const response = await fetchFromXeni<XeniProduct[]>("/products/bestselling?per_page=12");
+      const products = response || [];
+      return products.map(mapXeniProductToEpic);
+    } catch {
+      console.error("Failed to fetch best-selling products from Xeni, returning empty array");
+      return [];
+    }
+  },
+
+  async getNewProducts(): Promise<Product[]> {
+    try {
+      const response = await fetchFromXeni<XeniProduct[]>("/products/new?per_page=12");
+      const products = response || [];
+      return products.map(mapXeniProductToEpic);
+    } catch {
+      console.error("Failed to fetch new products from Xeni, returning empty array");
       return [];
     }
   },

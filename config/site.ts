@@ -10,7 +10,7 @@ export const siteConfig = {
 
 export const mainNav: NavLink[] = [
   { labelKey: "explore", href: "/explore" },
-  { labelKey: "stores", href: "/explore" },
+  { labelKey: "stores", href: "/stores" },
   { labelKey: "openStore", href: "/seller" },
   { labelKey: "about", href: "/about" },
 ];
@@ -20,7 +20,7 @@ export const footerNav: FooterNavGroup[] = [
     titleKey: "marketplace",
     links: [
       { labelKey: "explore", href: "/explore" },
-      { labelKey: "stores", href: "/explore" },
+      { labelKey: "stores", href: "/stores" },
       { labelKey: "cart", href: "/cart" },
     ],
   },

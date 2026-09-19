@@ -656,6 +656,15 @@ export const mockProvider: CommerceProvider = {
   async getProducts() {
     return products;
   },
+  async getFeaturedProducts() {
+    return products.filter((product) => product.badge === "featured").slice(0, 12);
+  },
+  async getBestSellingProducts() {
+    return products.filter((product) => product.badge === "trending").slice(0, 12);
+  },
+  async getNewProducts() {
+    return products.filter((product) => product.badge === "new").slice(0, 12);
+  },
   async getProductsByStore(storeId) {
     return products.filter((product) => product.storeId === storeId);
   },

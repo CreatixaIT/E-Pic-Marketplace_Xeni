@@ -5,54 +5,118 @@ import { Section, SectionHeading } from "@/components/ui/section";
 import { StoreGrid } from "@/components/stores/store-grid";
 import { getCommerceProvider } from "@/lib/commerce";
 import { getPreferences } from "@/lib/preferences/server";
+import { SearchBar } from "@/components/search/search-bar";
+import { CategoryFilter } from "@/components/search/category-filter";
 
 export const metadata: Metadata = {
-  title: "Explore stores",
-  description:
-    "Browse the brands building their own storefront worlds on E-pic.",
+  title: "Explore E-Pic Marketplace",
+  description: "Discover amazing products and stores from across the E-Pic marketplace.",
 };
 
-export default async function ExplorePage() {
+export default async function ExplorePage({
+  searchParams,
+}: {
+  searchParams: { search?: string; category?: string };
+}) {
   const commerce = getCommerceProvider();
-  const [stores, products, { locale, dictionary }] = await Promise.all([
+  const search = searchParams.search || "";
+  const category = searchParams.category;
+
+  const [stores, products, categories, { locale, dictionary }] = await Promise.all([
     commerce.getStores(),
-    commerce.getProducts(),
+    category ? commerce.getProductsByCategory(category as any) : commerce.getProducts(),
+    commerce.getCategories(),
     getPreferences(),
   ]);
+
+  // Filter products by search if provided
+  const filteredProducts = search
+    ? products.filter(
+        (product) =>
+          product.name.toLowerCase().includes(search.toLowerCase()) ||
+          product.description.toLowerCase().includes(search.toLowerCase()) ||
+          product.storeName.toLowerCase().includes(search.toLowerCase())
+      )
+    : products;
 
   return (
     <>
       <PageHeader
-        eyebrow="Explore"
-        title="Every world currently open on E-pic"
-        description="A preview of the directory. Filtering, search and live inventory arrive with the commerce integration."
+        eyebrow="Marketplace"
+        title="Discover Amazing Products"
+        description="Explore the best products and stores from sellers across the E-Pic marketplace."
       />
 
+      {/* Search and Filter Section */}
       <Section>
-        <SectionHeading
-          eyebrow="Stores"
-          title="Brands on the marketplace"
-          description={`${stores.length} storefronts, each running its own experience.`}
-        />
-        <div className="mt-12">
-          <StoreGrid stores={stores} />
+        <div className="max-w-4xl mx-auto space-y-6">
+          <SearchBar />
+          <CategoryFilter categories={categories} selectedCategory={category} />
         </div>
       </Section>
 
-      <Section className="border-t border-border bg-surface/40">
-        <SectionHeading
-          eyebrow="Products"
-          title="A slice of what's inside"
-          description="Sample listings pulled through the commerce layer's mock provider."
-        />
-        <div className="mt-12">
-          <ProductGrid
-            products={products}
-            badges={dictionary.badges}
-            locale={locale}
+      {/* Search Results */}
+      {search && (
+        <Section>
+          <SectionHeading
+            eyebrow="Search Results"
+            title={`Results for "${search}"`}
+            description={`${filteredProducts.length} products found`}
           />
-        </div>
-      </Section>
+          <div className="mt-12">
+            <ProductGrid
+              products={filteredProducts}
+              badges={dictionary.badges}
+              locale={locale}
+            />
+          </div>
+        </Section>
+      )}
+
+      {/* Featured Products */}
+      {!search && filteredProducts.length > 0 && (
+        <Section>
+          <SectionHeading
+            eyebrow="All Products"
+            title="Browse Products"
+            description={`${filteredProducts.length} products available`}
+          />
+          <div className="mt-12">
+            <ProductGrid
+              products={filteredProducts}
+              badges={dictionary.badges}
+              locale={locale}
+            />
+          </div>
+        </Section>
+      )}
+
+      {/* Stores */}
+      {stores.length > 0 && (
+        <Section className="border-t border-border bg-surface/40">
+          <SectionHeading
+            eyebrow="Stores"
+            title="Featured Stores"
+            description={`${stores.length} storefronts, each running its own experience.`}
+          />
+          <div className="mt-12">
+            <StoreGrid stores={stores} />
+          </div>
+        </Section>
+      )}
+
+      {/* Empty State */}
+      {filteredProducts.length === 0 && (
+        <Section>
+          <div className="text-center py-16">
+            <p className="text-lg text-muted">
+              {search
+                ? `No products found for "${search}"`
+                : "No products available yet"}
+            </p>
+          </div>
+        </Section>
+      )}
     </>
   );
 }

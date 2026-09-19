@@ -54,7 +54,7 @@ export type StoreTheme = {
 };
 
 /** Storefront presentation templates */
-export type StoreTemplate = "minimal" | "editorial" | "immersive";
+export type StoreTemplate = "minimal" | "luxury" | "colorful" | "editorial" | "immersive";
 
 /** Store-specific visual configuration for the chosen template */
 export type StoreVisualConfig = {
@@ -192,6 +192,9 @@ export interface CommerceProvider {
   getStoreBySlug(slug: string): Promise<Store | null>;
   getStoreById(storeId: string): Promise<Store | null>;
   getProducts(): Promise<Product[]>;
+  getFeaturedProducts(): Promise<Product[]>;
+  getBestSellingProducts(): Promise<Product[]>;
+  getNewProducts(): Promise<Product[]>;
   getProductsByStore(storeId: string): Promise<Product[]>;
   getProductsByCategory(category: CategoryId): Promise<Product[]>;
   getCategories(): Promise<Category[]>;
