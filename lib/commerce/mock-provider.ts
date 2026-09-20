@@ -280,6 +280,7 @@ const products: Product[] = [
     categoryLabel: categoryLabels.home,
     price: usd(28900),
     image: { gradient: "from-amber-200 to-rose-500", alt: "Opal table lamp" },
+    images: [],
     badge: "featured",
     collections: ["featured", "trending"],
     tags: ["lighting", "brass"],
@@ -693,7 +694,7 @@ export const mockProvider: CommerceProvider = {
   async getProductBySlug(slug: string): Promise<Product | null> {
     return products.find((product) => product.slug === slug) ?? null;
   },
-  async addToCart(productId: string, quantity: number): Promise<Cart> {
+  async addToCart(productId: string, quantity: number, variantId?: string): Promise<Cart> {
     // Mock implementation
     const product = products.find((p) => p.id === productId);
     if (!product) return { id: "cart_mock", lines: [], subtotal: { amount: 0, currency: "USD" }, currency: "USD" };

@@ -312,6 +312,77 @@ async function fetchFromXeni<T>(endpoint: string): Promise<T> {
 }
 
 // Helper: Create empty cart
+// Helper: Map Xeni cart to E-Pic cart
+function mapXeniCartToEpic(xeniCart: any): Cart {
+  if (!xeniCart || !xeniCart.cart_items) {
+    return createEmptyCart();
+  }
+
+  const lines: CartLine[] = xeniCart.cart_items.map((item: any) => {
+    const product = item.product;
+    const variant = item.variant;
+    
+    // Calculate price (use variant price if available, otherwise product price)
+    const basePrice = product?.price || 0;
+    const priceModifier = variant?.price_modifier || 0;
+    const finalPrice = basePrice + priceModifier;
+    
+    // Build product object
+    const epicProduct: Product = {
+      id: product?.id || item.product_id,
+      slug: product?.id || item.product_id, // Use ID as slug for now
+      storeId: product?.store?.id || "",
+      storeName: product?.store?.shop_name || "Unknown Store",
+      name: product?.name || "Unknown Product",
+      nameBn: product?.name_bn,
+      description: product?.description || "",
+      category: "lifestyle",
+      categoryLabel: "Lifestyle",
+      price: xeniPriceToMoney(finalPrice),
+      originalPrice: xeniPriceToMoney(basePrice),
+      availability: product?.is_out_of_stock ? "out-of-stock" : "in-stock",
+      image: {
+        gradient: "from-neutral-200 to-neutral-400",
+        alt: product?.name || "Product image",
+        url: product?.images?.[0] || undefined,
+      },
+      images: (product?.images || []).map((img: string) => ({
+        gradient: "from-neutral-200 to-neutral-400",
+        alt: product?.name || "Product image",
+        url: img,
+      })),
+      collections: [], // Xeni doesn't have collections, use empty array
+      tags: [], // Xeni doesn't have tags, use empty array
+      variant: variant ? {
+        id: variant.id,
+        sku: variant.sku,
+        color: variant.color,
+        size: variant.size,
+        priceModifier: variant.price_modifier,
+        stock: variant.stock,
+        active: variant.is_active,
+      } : undefined,
+    };
+
+    return {
+      id: item.id,
+      product: epicProduct,
+      quantity: item.quantity,
+      lineTotal: xeniPriceToMoney(finalPrice * item.quantity),
+    };
+  });
+
+  // Calculate subtotal
+  const subtotal = lines.reduce((total, line) => total + line.lineTotal.amount, 0);
+
+  return {
+    id: xeniCart.id,
+    lines,
+    subtotal: { amount: subtotal, currency: "BDT" },
+    currency: "BDT",
+  };
+}
+
 function createEmptyCart(): Cart {
   return {
     id: "cart-empty",
@@ -598,8 +669,24 @@ export const xeniProvider: CommerceProvider = {
   },
 
   async getCart(): Promise<Cart> {
-    // Cart now uses server-side API routes
-    return createEmptyCart();
+    // Fetch cart from server-side API route which calls Xeni
+    const sessionId = getSessionId();
+    const url = sessionId ? `/api/cart?session_id=${sessionId}` : `/api/cart`;
+    
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error("Failed to fetch cart:", response.status);
+        return createEmptyCart();
+      }
+      
+      const data = await response.json();
+      // Map Xeni cart response to E-Pic cart format
+      return mapXeniCartToEpic(data);
+    } catch (error) {
+      console.error("Cart fetch error:", error);
+      return createEmptyCart();
+    }
   },
 
   async getProductBySlug(slug: string): Promise<Product | null> {
@@ -612,18 +699,24 @@ export const xeniProvider: CommerceProvider = {
     }
   },
 
-  async addToCart(productId: string, quantity: number): Promise<Cart> {
+  async addToCart(productId: string, quantity: number, variantId?: string): Promise<Cart> {
     // Uses server-side API route
     const sessionId = ensureSessionId();
+    const body: any = { product_id: productId, quantity };
+    if (variantId) {
+      body.variant_id = variantId;
+    }
+    
     const response = await fetch(`/api/cart/items?session_id=${sessionId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ product_id: productId, quantity }),
+      body: JSON.stringify(body),
     });
     if (!response.ok) throw new Error("Failed to add to cart");
+    
+    const data = await response.json();
     // Map Xeni cart response to E-Pic cart
-    // TODO: Implement full mapping once we have Xeni cart response structure
-    return createEmptyCart();
+    return mapXeniCartToEpic(data);
   },
 
   async updateCartItem(itemId: string, quantity: number): Promise<Cart> {
@@ -635,7 +728,9 @@ export const xeniProvider: CommerceProvider = {
       body: JSON.stringify({ quantity }),
     });
     if (!response.ok) throw new Error("Failed to update cart item");
-    return createEmptyCart();
+    
+    const data = await response.json();
+    return mapXeniCartToEpic(data);
   },
 
   async removeFromCart(itemId: string): Promise<Cart> {
@@ -645,7 +740,9 @@ export const xeniProvider: CommerceProvider = {
       method: "DELETE",
     });
     if (!response.ok) throw new Error("Failed to remove cart item");
-    return createEmptyCart();
+    
+    const data = await response.json();
+    return mapXeniCartToEpic(data);
   },
 
   async clearCart(): Promise<void> {

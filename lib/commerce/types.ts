@@ -104,11 +104,14 @@ export type Product = {
   storeId: string;
   storeName: string;
   name: string;
+  nameBn?: string;
   description: string;
   category: CategoryId;
   categoryLabel: string;
   price: Money;
+  originalPrice?: Money;
   image: Image;
+  images?: Image[]; // Multiple images for gallery
   badge?: ProductBadge;
   collections: CollectionId[];
   tags: string[];
@@ -116,6 +119,16 @@ export type Product = {
   highlights?: string[];
   /** Availability status */
   availability: "in-stock" | "low-stock" | "out-of-stock";
+  /** Variant information if product has variants */
+  variant?: {
+    id: string;
+    sku: string;
+    color?: string;
+    size?: string;
+    priceModifier: number;
+    stock: number;
+    active: boolean;
+  };
 };
 
 /** A promotional slide in the homepage hero. Content is mock data. */
@@ -211,4 +224,6 @@ export interface CommerceProvider {
   checkout(request: CheckoutRequest): Promise<Order[]>;
   getOrders(): Promise<Order[]>;
   getOrderById(orderId: string): Promise<Order | null>;
+  // Cart operations with variant support
+  addToCart(productId: string, quantity: number, variantId?: string): Promise<Cart>;
 }

@@ -23,6 +23,35 @@ export function CartProvider({ children }: { children: ReactNode }) {
     saveCartToStorage(cart);
   }, [cart]);
 
+  // Load cart from Xeni on mount
+  useEffect(() => {
+    const loadXeniCart = async () => {
+      try {
+        const commerce = await import("@/lib/commerce");
+        const provider = commerce.getCommerceProvider();
+        const xeniCart = await provider.getCart();
+        
+        setCart({
+          items: xeniCart.lines.map(line => ({
+            cartItemId: line.id,
+            productId: line.product.id,
+            product: line.product,
+            quantity: line.quantity,
+            storeId: line.product.storeId,
+            storeName: line.product.storeName,
+          })),
+          storeId: xeniCart.lines.length > 0 ? xeniCart.lines[0].product.storeId : null,
+          storeName: xeniCart.lines.length > 0 ? xeniCart.lines[0].product.storeName : null,
+        });
+      } catch (error) {
+        console.error("Failed to load cart from Xeni:", error);
+        // Keep localStorage cart as fallback
+      }
+    };
+    
+    loadXeniCart();
+  }, []);
+
   const itemCount = cart.items.reduce((total, item) => total + item.quantity, 0);
   
   const subtotal = cart.items.reduce(
@@ -39,89 +68,101 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return false; // Signal that cross-store checkout was attempted
     }
 
-    // Sync with backend cart
+    // Use commerce provider to add item
     try {
-      const response = await fetch("/api/cart/items", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          product_id: product.id,
-          quantity,
-        }),
+      const commerce = await import("@/lib/commerce");
+      const provider = commerce.getCommerceProvider();
+      
+      // Add variant ID if product has a selected variant
+      const variantId = product.variant?.id;
+      const updatedCart = await provider.addToCart(product.id, quantity, variantId);
+      
+      // Update cart state with the returned cart from backend
+      setCart({
+        items: updatedCart.lines.map(line => ({
+          cartItemId: line.id, // Store the cart item ID from Xeni
+          productId: line.product.id,
+          product: line.product,
+          quantity: line.quantity,
+          storeId: line.product.storeId,
+          storeName: line.product.storeName,
+        })),
+        storeId: updatedCart.lines.length > 0 ? updatedCart.lines[0].product.storeId : null,
+        storeName: updatedCart.lines.length > 0 ? updatedCart.lines[0].product.storeName : null,
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        // Update local cart with backend response
-        // For now, keep local cart for immediate UI updates
-      }
+      
+      return true;
     } catch (error) {
-      console.error("Failed to sync cart with backend:", error);
+      console.error("Failed to add to cart:", error);
+      return false;
     }
-
-    setCart((prev) => {
-      const existingItem = prev.items.find((item) => item.productId === product.id);
-      
-      let newItems: CartItem[];
-      if (existingItem) {
-        newItems = prev.items.map((item) =>
-          item.productId === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      } else {
-        newItems = [
-          ...prev.items,
-          {
-            productId: product.id,
-            product,
-            quantity,
-            storeId: product.storeId,
-            storeName: product.storeName,
-          },
-        ];
-      }
-
-      return {
-        items: newItems,
-        storeId: product.storeId,
-        storeName: product.storeName,
-      };
-    });
-
-    return true;
   };
 
-  const removeItem = (productId: string) => {
-    setCart((prev) => {
-      const newItems = prev.items.filter((item) => item.productId !== productId);
+  const removeItem = async (productId: string) => {
+    try {
+      const commerce = await import("@/lib/commerce");
+      const provider = commerce.getCommerceProvider();
       
-      // If cart is now empty, clear store constraint
-      if (newItems.length === 0) {
-        return { items: [], storeId: null, storeName: null };
-      }
-
-      return {
-        ...prev,
-        items: newItems,
-      };
-    });
+      // Find the cart item for this product to get its Xeni cart item ID
+      const cartItem = cart.items.find(item => item.productId === productId);
+      if (!cartItem) return;
+      
+      await provider.removeFromCart(cartItem.cartItemId);
+      
+      // Refresh cart from backend to get updated state
+      const updatedCart = await provider.getCart();
+      
+      setCart({
+        items: updatedCart.lines.map(line => ({
+          cartItemId: line.id,
+          productId: line.product.id,
+          product: line.product,
+          quantity: line.quantity,
+          storeId: line.product.storeId,
+          storeName: line.product.storeName,
+        })),
+        storeId: updatedCart.lines.length > 0 ? updatedCart.lines[0].product.storeId : null,
+        storeName: updatedCart.lines.length > 0 ? updatedCart.lines[0].product.storeName : null,
+      });
+    } catch (error) {
+      console.error("Failed to remove from cart:", error);
+    }
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = async (productId: string, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(productId);
+      await removeItem(productId);
       return;
     }
 
-    setCart((prev) => ({
-      ...prev,
-      items: prev.items.map((item) =>
-        item.productId === productId ? { ...item, quantity } : item
-      ),
-    }));
+    try {
+      const commerce = await import("@/lib/commerce");
+      const provider = commerce.getCommerceProvider();
+      
+      // Find the cart item for this product to get its Xeni cart item ID
+      const cartItem = cart.items.find(item => item.productId === productId);
+      if (!cartItem) return;
+      
+      await provider.updateCartItem(cartItem.cartItemId, quantity);
+      
+      // Refresh cart from backend to get updated state
+      const updatedCart = await provider.getCart();
+      
+      setCart({
+        items: updatedCart.lines.map(line => ({
+          cartItemId: line.id,
+          productId: line.product.id,
+          product: line.product,
+          quantity: line.quantity,
+          storeId: line.product.storeId,
+          storeName: line.product.storeName,
+        })),
+        storeId: updatedCart.lines.length > 0 ? updatedCart.lines[0].product.storeId : null,
+        storeName: updatedCart.lines.length > 0 ? updatedCart.lines[0].product.storeName : null,
+      });
+    } catch (error) {
+      console.error("Failed to update cart quantity:", error);
+    }
   };
 
   const clearCart = () => {

@@ -217,6 +217,7 @@ export type Dictionary = {
     weakPassword: string;
     requiredField: string;
     backToHome: string;
+    verificationError: string;
   };
   account: {
     myAccount: string;

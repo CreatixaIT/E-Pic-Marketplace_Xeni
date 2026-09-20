@@ -9,6 +9,7 @@ import type { Product } from "@/lib/commerce/types";
  */
 
 export type CartItem = {
+  cartItemId: string; // Xeni cart item ID for updates/removal
   productId: string;
   product: Product;
   quantity: number;
@@ -30,8 +31,8 @@ export type CartContextType = {
   subtotal: number;
   currency: string; // Derived from cart items, future-ready for multi-currency
   addItem: (product: Product, quantity: number) => Promise<boolean>;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeItem: (productId: string) => Promise<void>;
+  updateQuantity: (productId: string, quantity: number) => Promise<void>;
   clearCart: () => void;
   isCrossStoreCheckout: (product: Product) => boolean;
   // Express checkout: persist non-sensitive preferences locally
