@@ -8,6 +8,8 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { useDictionary } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
+import { Eye, EyeOff, Check, X } from "lucide-react";
+import { validatePassword, checkPasswordRequirements } from "@/lib/validation";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -22,6 +24,8 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Redirect if already logged in
   if (session) {
@@ -29,8 +33,15 @@ export default function RegisterPage() {
     return null;
   }
 
+  const passwordRequirements = checkPasswordRequirements(formData.password);
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+
+    // Full name validation
+    if (!formData.full_name.trim()) {
+      newErrors.full_name = dict.auth.requiredField;
+    }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,10 +52,11 @@ export default function RegisterPage() {
     }
 
     // Password validation
+    const passwordValidation = validatePassword(formData.password);
     if (!formData.password) {
       newErrors.password = dict.auth.requiredField;
-    } else if (formData.password.length < 8) {
-      newErrors.password = dict.auth.weakPassword;
+    } else if (!passwordValidation.isValid) {
+      newErrors.password = dict.auth.passwordRequirements;
     }
 
     // Confirm password validation
@@ -75,7 +87,7 @@ export default function RegisterPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          full_name: formData.full_name || undefined,
+          full_name: formData.full_name,
           email: formData.email,
           password: formData.password,
         }),
@@ -89,8 +101,8 @@ export default function RegisterPage() {
           setErrors({ email: dict.auth.emailExists });
         } else if (data.error === "Invalid email format") {
           setErrors({ email: dict.auth.invalidEmail });
-        } else if (data.error === "Password must be at least 8 characters long") {
-          setErrors({ password: dict.auth.weakPassword });
+        } else if (data.error.includes("Password")) {
+          setErrors({ password: data.error });
         } else {
           setErrors({ form: data.error || dict.auth.registerError });
         }
@@ -122,6 +134,14 @@ export default function RegisterPage() {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword((prev) => !prev);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
       <Container>
@@ -137,7 +157,7 @@ export default function RegisterPage() {
                 {dict.auth.registerSuccess}
               </div>
               <div className="text-green-600 text-sm">
-                Redirecting to login...
+                Redirecting to verification...
               </div>
             </div>
           ) : (
@@ -150,7 +170,7 @@ export default function RegisterPage() {
 
               <div>
                 <label htmlFor="full_name" className="block text-sm font-medium mb-2">
-                  {dict.auth.name} <span className="text-muted">(optional)</span>
+                  {dict.auth.name} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="full_name"
@@ -162,9 +182,13 @@ export default function RegisterPage() {
                   className={cn(
                     "w-full px-4 py-3 rounded-lg border bg-background",
                     "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
-                    "transition-colors"
+                    "transition-colors",
+                    errors.full_name && "border-red-500"
                   )}
                 />
+                {errors.full_name && (
+                  <p className="mt-1 text-sm text-red-500">{errors.full_name}</p>
+                )}
               </div>
 
               <div>
@@ -194,48 +218,94 @@ export default function RegisterPage() {
                 <label htmlFor="password" className="block text-sm font-medium mb-2">
                   {dict.auth.password} <span className="text-red-500">*</span>
                 </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder={dict.auth.passwordPlaceholder}
-                  className={cn(
-                    "w-full px-4 py-3 rounded-lg border bg-background",
-                    "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
-                    "transition-colors",
-                    errors.password && "border-red-500"
-                  )}
-                />
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder={dict.auth.passwordPlaceholder}
+                    className={cn(
+                      "w-full px-4 py-3 rounded-lg border bg-background pr-12",
+                      "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
+                      "transition-colors",
+                      errors.password && "border-red-500"
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    aria-label={showPassword ? dict.auth.hidePassword : dict.auth.showPassword}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-foreground"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-500">{errors.password}</p>
                 )}
-                <p className="mt-1 text-xs text-muted">
-                  {dict.auth.weakPassword}
-                </p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-xs text-muted mb-1">{dict.auth.passwordRequirements}</p>
+                  <div className="grid grid-cols-2 gap-1 text-xs">
+                    <div className={cn("flex items-center gap-1", passwordRequirements.length ? "text-green-600" : "text-muted")}>
+                      {passwordRequirements.length ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                      {dict.auth.passwordLength}
+                    </div>
+                    <div className={cn("flex items-center gap-1", passwordRequirements.uppercase ? "text-green-600" : "text-muted")}>
+                      {passwordRequirements.uppercase ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                      {dict.auth.passwordUppercase}
+                    </div>
+                    <div className={cn("flex items-center gap-1", passwordRequirements.lowercase ? "text-green-600" : "text-muted")}>
+                      {passwordRequirements.lowercase ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                      {dict.auth.passwordLowercase}
+                    </div>
+                    <div className={cn("flex items-center gap-1", passwordRequirements.number ? "text-green-600" : "text-muted")}>
+                      {passwordRequirements.number ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                      {dict.auth.passwordNumber}
+                    </div>
+                    <div className={cn("flex items-center gap-1", passwordRequirements.special ? "text-green-600" : "text-muted")}>
+                      {passwordRequirements.special ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                      {dict.auth.passwordSpecial}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
                   {dict.auth.confirmPassword} <span className="text-red-500">*</span>
                 </label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder={dict.auth.confirmPasswordPlaceholder}
-                  className={cn(
-                    "w-full px-4 py-3 rounded-lg border bg-background",
-                    "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
-                    "transition-colors",
-                    errors.confirmPassword && "border-red-500"
-                  )}
-                />
+                <div className="relative">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder={dict.auth.confirmPasswordPlaceholder}
+                    className={cn(
+                      "w-full px-4 py-3 rounded-lg border bg-background pr-12",
+                      "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
+                      "transition-colors",
+                      errors.confirmPassword && "border-red-500",
+                      formData.confirmPassword && formData.password === formData.confirmPassword && !errors.confirmPassword && "border-green-500"
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={toggleConfirmPasswordVisibility}
+                    aria-label={showConfirmPassword ? dict.auth.hidePassword : dict.auth.showPassword}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-foreground"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
                 {errors.confirmPassword && (
                   <p className="mt-1 text-sm text-red-500">{errors.confirmPassword}</p>
+                )}
+                {formData.confirmPassword && formData.password === formData.confirmPassword && !errors.confirmPassword && (
+                  <p className="mt-1 text-sm text-green-600">{dict.auth.passwordMatch}</p>
                 )}
               </div>
 

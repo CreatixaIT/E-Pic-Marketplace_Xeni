@@ -2,6 +2,9 @@ import { NextResponse } from "next/server"
 
 const GATEWAY_AUTH_API_BASE_URL = process.env.XENI_AUTH_API_BASE_URL || "http://localhost:8080/api/auth"
 
+// Password strength regex: at least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
+
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -24,10 +27,10 @@ export async function POST(request: Request) {
       )
     }
 
-    // Validate password strength (minimum 8 characters)
-    if (password.length < 8) {
+    // Validate password strength
+    if (!PASSWORD_REGEX.test(password)) {
       return NextResponse.json(
-        { error: "Password must be at least 8 characters long" },
+        { error: "Password must be at least 8 characters and contain uppercase, lowercase, number, and special character" },
         { status: 400 }
       )
     }

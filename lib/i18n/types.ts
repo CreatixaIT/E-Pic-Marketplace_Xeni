@@ -223,8 +223,17 @@ export type Dictionary = {
     invalidEmail: string;
     invalidPassword: string;
     passwordMismatch: string;
+    passwordMatch: string;
     emailExists: string;
     weakPassword: string;
+    passwordRequirements: string;
+    passwordLength: string;
+    passwordUppercase: string;
+    passwordLowercase: string;
+    passwordNumber: string;
+    passwordSpecial: string;
+    showPassword: string;
+    hidePassword: string;
     requiredField: string;
     backToHome: string;
     verificationError: string;
