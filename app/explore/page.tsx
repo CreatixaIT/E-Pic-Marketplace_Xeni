@@ -42,9 +42,9 @@ export default async function ExplorePage({
   return (
     <>
       <PageHeader
-        eyebrow="Marketplace"
-        title="Discover Amazing Products"
-        description="Explore the best products and stores from sellers across the E-Pic marketplace."
+        eyebrow={dictionary.worlds.eyebrow}
+        title={dictionary.discovery.title}
+        description={dictionary.discovery.description}
       />
 
       {/* Search and Filter Section */}
@@ -59,9 +59,9 @@ export default async function ExplorePage({
       {search && (
         <Section>
           <SectionHeading
-            eyebrow="Search Results"
+            eyebrow={dictionary.discovery.searchResults}
             title={`Results for "${search}"`}
-            description={`${filteredProducts.length} products found`}
+            description={`${filteredProducts.length} ${dictionary.discovery.resultCount}`}
           />
           <div className="mt-12">
             <ProductGrid
@@ -77,9 +77,9 @@ export default async function ExplorePage({
       {!search && filteredProducts.length > 0 && (
         <Section>
           <SectionHeading
-            eyebrow="All Products"
-            title="Browse Products"
-            description={`${filteredProducts.length} products available`}
+            eyebrow={dictionary.discovery.eyebrow}
+            title={dictionary.discovery.title}
+            description={`${filteredProducts.length} ${dictionary.discovery.resultCount}`}
           />
           <div className="mt-12">
             <ProductGrid
@@ -95,9 +95,9 @@ export default async function ExplorePage({
       {stores.length > 0 && (
         <Section className="border-t border-border bg-surface/40">
           <SectionHeading
-            eyebrow="Stores"
-            title="Featured Stores"
-            description={`${stores.length} storefronts, each running its own experience.`}
+            eyebrow={dictionary.worlds.eyebrow}
+            title={dictionary.worlds.title}
+            description={`${stores.length} ${dictionary.worlds.products}, ${dictionary.worlds.storeDescription}`}
           />
           <div className="mt-12">
             <StoreGrid stores={stores} />
@@ -112,7 +112,7 @@ export default async function ExplorePage({
             <p className="text-lg text-muted">
               {search
                 ? `No products found for "${search}"`
-                : "No products available yet"}
+                : dictionary.discovery.empty}
             </p>
           </div>
         </Section>

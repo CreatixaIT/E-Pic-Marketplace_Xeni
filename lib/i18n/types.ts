@@ -37,6 +37,7 @@ export type Dictionary = {
     empty: string;
     viewAll: string;
     resultCount: string;
+    searchResults: string;
   };
   collections: {
     eyebrow: string;
@@ -53,6 +54,7 @@ export type Dictionary = {
     enterStore: string;
     viewAllStores: string;
     products: string;
+    storeDescription: string;
   };
   seller: {
     eyebrow: string;

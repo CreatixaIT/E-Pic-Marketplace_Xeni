@@ -15,9 +15,9 @@ export default async function CartPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Cart"
-        title="Your bag"
-        description="Review your items before checkout."
+        eyebrow={dictionary.nav.cart}
+        title={dictionary.cart.empty}
+        description={dictionary.cart.checkout}
       />
 
       <Section>

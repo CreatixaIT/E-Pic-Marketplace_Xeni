@@ -36,6 +36,7 @@ export const bn: Dictionary = {
     empty: "এই ক্যাটাগরিতে এখনো কিছু নেই।",
     viewAll: "সব পণ্য দেখুন",
     resultCount: "{count}টি পণ্য",
+    searchResults: "অনুসন্ধান ফলাফল",
   },
   collections: {
     eyebrow: "কিউরেটেড",
@@ -54,6 +55,7 @@ export const bn: Dictionary = {
     enterStore: "স্টোরে প্রবেশ করুন",
     viewAllStores: "সব স্টোর দেখুন",
     products: "পণ্য",
+    storeDescription: "প্রতিটি স্টোর Xeni দ্বারা চালিত একটি অনন্য কেনাকাটা অভিজ্ঞতা অফার করে।",
   },
   seller: {
     eyebrow: "বিক্রেতাদের জন্য",

@@ -36,6 +36,7 @@ export const en: Dictionary = {
     empty: "Nothing in this category yet.",
     viewAll: "View all products",
     resultCount: "{count} products",
+    searchResults: "Search Results",
   },
   collections: {
     eyebrow: "Curated",
@@ -54,6 +55,7 @@ export const en: Dictionary = {
     enterStore: "Enter Store",
     viewAllStores: "View all stores",
     products: "products",
+    storeDescription: "Each store offers a unique shopping experience powered by Xeni.",
   },
   seller: {
     eyebrow: "For sellers",
