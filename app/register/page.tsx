@@ -98,9 +98,9 @@ export default function RegisterPage() {
       }
 
       setSuccess(true);
-      // Redirect to login after successful registration
+      // Redirect to verification page after successful registration
       setTimeout(() => {
-        router.push("/login");
+        router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
       }, 2000);
     } catch {
       setErrors({ form: dict.auth.registerError });

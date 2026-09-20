@@ -219,6 +219,7 @@ export const en: Dictionary = {
     weakPassword: "Password must be at least 8 characters",
     requiredField: "This field is required",
     backToHome: "Back to home",
+    verificationError: "Failed to verify email",
   },
   account: {
     myAccount: "My Account",

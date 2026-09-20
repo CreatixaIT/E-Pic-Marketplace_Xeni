@@ -219,6 +219,7 @@ export const bn: Dictionary = {
     weakPassword: "পাসওয়ার্ড অন্তত ৮ অক্ষরের হতে হবে",
     requiredField: "এই ফিল্ডটি প্রয়োজনীয়",
     backToHome: "হোমে ফিরে যান",
+    verificationError: "ইমেইল যাচাই ব্যর্থ হয়েছে",
   },
   account: {
     myAccount: "আমার অ্যাকাউন্ট",

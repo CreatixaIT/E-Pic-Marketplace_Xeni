@@ -23,6 +23,7 @@ export default function LoginPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [verificationRequired, setVerificationRequired] = useState(false);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -62,7 +63,13 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setErrors({ form: dict.auth.loginError });
+        // Check if error is related to email verification
+        if (result.error.includes("verify your email") || result.error.includes("Please verify")) {
+          setVerificationRequired(true);
+          setErrors({ form: "Please verify your email before logging in." });
+        } else {
+          setErrors({ form: dict.auth.loginError });
+        }
         return;
       }
 
@@ -107,6 +114,16 @@ export default function LoginPage() {
             {errors.form && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 text-sm">
                 {errors.form}
+                {verificationRequired && (
+                  <div className="mt-2">
+                    <Link
+                      href={`/verify-email?email=${encodeURIComponent(formData.email)}`}
+                      className="text-accent hover:underline font-medium"
+                    >
+                      Go to email verification
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
 
