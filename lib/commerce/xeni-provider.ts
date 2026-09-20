@@ -13,8 +13,9 @@ import type {
   Store,
 } from "./types";
 
-// Xeni API Configuration
-const XENI_API_BASE_URL = process.env.XENI_API_BASE_URL || "http://localhost:8080/api/public/v1";
+// Xeni API Configuration - Separated by endpoint type
+const XENI_PUBLIC_API_BASE_URL = process.env.XENI_PUBLIC_API_BASE_URL || "http://localhost:8080/api/public/v1";
+const XENI_API_BASE_URL = process.env.XENI_API_BASE_URL || "http://localhost:8080/api";
 const LOW_STOCK_THRESHOLD = 10;
 
 // Xeni API Response Types
@@ -286,8 +287,33 @@ function mapXeniCategoryToEpic(xeniCategory: XeniCategory): Category {
   };
 }
 
-// Helper: Fetch from Xeni API with error handling
-async function fetchFromXeni<T>(endpoint: string): Promise<T> {
+// Helper: Fetch from Xeni Public API with error handling
+async function fetchFromXeniPublic<T>(endpoint: string): Promise<T> {
+  try {
+    const url = `${XENI_PUBLIC_API_BASE_URL}${endpoint}`;
+    const response = await fetch(url, {
+      next: { revalidate: 300 }, // Cache for 5 minutes
+    });
+
+    if (!response.ok) {
+      throw new Error(`Xeni Public API error: ${response.status} ${response.statusText}`);
+    }
+
+    const result: XeniApiResponse<T> = await response.json();
+
+    if (!result.success) {
+      throw new Error(`Xeni Public API error: ${result.error || "Unknown error"}`);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error(`Error fetching from Xeni Public API (${endpoint}):`, error);
+    throw error;
+  }
+}
+
+// Helper: Fetch from Xeni Buyer API with error handling
+async function fetchFromXeniBuyer<T>(endpoint: string): Promise<T> {
   try {
     const url = `${XENI_API_BASE_URL}${endpoint}`;
     const response = await fetch(url, {
@@ -295,18 +321,18 @@ async function fetchFromXeni<T>(endpoint: string): Promise<T> {
     });
 
     if (!response.ok) {
-      throw new Error(`Xeni API error: ${response.status} ${response.statusText}`);
+      throw new Error(`Xeni Buyer API error: ${response.status} ${response.statusText}`);
     }
 
     const result: XeniApiResponse<T> = await response.json();
 
     if (!result.success) {
-      throw new Error(`Xeni API error: ${result.error || "Unknown error"}`);
+      throw new Error(`Xeni Buyer API error: ${result.error || "Unknown error"}`);
     }
 
     return result.data;
   } catch (error) {
-    console.error(`Error fetching from Xeni API (${endpoint}):`, error);
+    console.error(`Error fetching from Xeni Buyer API (${endpoint}):`, error);
     throw error;
   }
 }
@@ -494,7 +520,7 @@ export const xeniProvider: CommerceProvider = {
 
   async getStores(): Promise<Store[]> {
     try {
-      const response = await fetchFromXeni<{ data: XeniStore[]; meta: { page: number; per_page: number; total: number; total_pages: number } }>("/stores?per_page=100");
+      const response = await fetchFromXeniPublic<{ data: XeniStore[]; meta: { page: number; per_page: number; total: number; total_pages: number } }>("/stores?per_page=100");
       const stores = response.data || [];
       return stores.map(store => mapXeniStoreToEpic(store));
     } catch {
@@ -516,7 +542,7 @@ export const xeniProvider: CommerceProvider = {
 
   async getStoreBySlug(slug: string): Promise<Store | null> {
     try {
-      const xeniStoreDetail = await fetchFromXeni<XeniStoreDetail>(`/stores/${slug}`);
+      const xeniStoreDetail = await fetchFromXeniPublic<XeniStoreDetail>(`/stores/${slug}`);
       return mapXeniStoreToEpic(xeniStoreDetail.store, xeniStoreDetail.product_count);
     } catch {
       console.error(`Failed to fetch store ${slug} from Xeni`);
@@ -530,7 +556,7 @@ export const xeniProvider: CommerceProvider = {
 
   async getProducts(): Promise<Product[]> {
     try {
-      const response = await fetchFromXeni<XeniProduct[]>("/products?per_page=100");
+      const response = await fetchFromXeniPublic<XeniProduct[]>("/products?per_page=100");
       const products = response || [];
       return products.map(mapXeniProductToEpic);
     } catch {
@@ -541,7 +567,7 @@ export const xeniProvider: CommerceProvider = {
 
   async getFeaturedProducts(): Promise<Product[]> {
     try {
-      const response = await fetchFromXeni<XeniProduct[]>("/products/featured?per_page=12");
+      const response = await fetchFromXeniPublic<XeniProduct[]>("/products/featured?per_page=12");
       const products = response || [];
       return products.map(mapXeniProductToEpic);
     } catch {
@@ -552,7 +578,7 @@ export const xeniProvider: CommerceProvider = {
 
   async getBestSellingProducts(): Promise<Product[]> {
     try {
-      const response = await fetchFromXeni<XeniProduct[]>("/products/bestselling?per_page=12");
+      const response = await fetchFromXeniPublic<XeniProduct[]>("/products/bestselling?per_page=12");
       const products = response || [];
       return products.map(mapXeniProductToEpic);
     } catch {
@@ -563,7 +589,7 @@ export const xeniProvider: CommerceProvider = {
 
   async getNewProducts(): Promise<Product[]> {
     try {
-      const response = await fetchFromXeni<XeniProduct[]>("/products/new?per_page=12");
+      const response = await fetchFromXeniPublic<XeniProduct[]>("/products/new?per_page=12");
       const products = response || [];
       return products.map(mapXeniProductToEpic);
     } catch {
@@ -574,7 +600,7 @@ export const xeniProvider: CommerceProvider = {
 
   async getProductsByStore(storeId: string): Promise<Product[]> {
     try {
-      const response = await fetchFromXeni<XeniProduct[]>(`/products?store_id=${storeId}&per_page=100`);
+      const response = await fetchFromXeniPublic<XeniProduct[]>(`/products?store_id=${storeId}&per_page=100`);
       const products = response || [];
       return products.map(mapXeniProductToEpic);
     } catch {
@@ -594,7 +620,7 @@ export const xeniProvider: CommerceProvider = {
         lifestyle: "lifestyle",
       };
       const slug = categoryToSlug[category];
-      const response = await fetchFromXeni<XeniProduct[]>(`/products?category=${slug}&per_page=100`);
+      const response = await fetchFromXeniPublic<XeniProduct[]>(`/products?category=${slug}&per_page=100`);
       const products = response || [];
       return products.map(mapXeniProductToEpic);
     } catch {
@@ -605,7 +631,7 @@ export const xeniProvider: CommerceProvider = {
 
   async getCategories(): Promise<Category[]> {
     try {
-      const xeniCategories = await fetchFromXeni<XeniCategory[]>("/categories");
+      const xeniCategories = await fetchFromXeniPublic<XeniCategory[]>("/categories");
       // Flatten hierarchy and map to E-Pic categories
       const flatCategories: XeniCategory[] = [];
       
@@ -691,7 +717,7 @@ export const xeniProvider: CommerceProvider = {
 
   async getProductBySlug(slug: string): Promise<Product | null> {
     try {
-      const xeniProduct = await fetchFromXeni<XeniProduct>(`/products/${slug}`);
+      const xeniProduct = await fetchFromXeniPublic<XeniProduct>(`/products/${slug}`);
       return mapXeniProductToEpic(xeniProduct);
     } catch {
       console.error(`Failed to fetch product ${slug} from Xeni`);

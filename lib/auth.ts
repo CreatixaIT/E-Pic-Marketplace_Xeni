@@ -45,7 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // For OAuth handoff, we only have email from the exchange response
           // We need to fetch user details from Gateway to get role and name
           try {
-            const GATEWAY_API_BASE_URL = process.env.XENI_API_BASE_URL || "http://localhost:8080/api/public/v1"
+            const GATEWAY_API_BASE_URL = process.env.XENI_API_BASE_URL || "http://localhost:8080/api"
             const response = await fetch(`${GATEWAY_API_BASE_URL}/user/me`, {
               headers: {
                 "Authorization": `Bearer ${accessToken}`,
