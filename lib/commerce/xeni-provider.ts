@@ -339,12 +339,50 @@ async function fetchFromXeniBuyer<T>(endpoint: string): Promise<T> {
 
 // Helper: Create empty cart
 // Helper: Map Xeni cart to E-Pic cart
-function mapXeniCartToEpic(xeniCart: any): Cart {
+type XeniCartItem = {
+  id: string;
+  product_id: string;
+  variant_id?: string;
+  quantity: number;
+  price: number;
+  product?: {
+    id: string;
+    name: string;
+    name_bn?: string;
+    description: string;
+    price: number;
+    is_out_of_stock: boolean;
+    images?: string[];
+    sku?: string;
+    store?: {
+      id: string;
+      shop_name: string;
+    };
+  };
+  variant?: {
+    id: string;
+    sku?: string;
+    color?: string;
+    size?: string;
+    price_modifier: number;
+    stock: number;
+    is_active: boolean;
+  };
+};
+
+type XeniCart = {
+  id?: string;
+  cart_items: XeniCartItem[];
+};
+
+function mapXeniCartToEpic(xeniCart: XeniCart): Cart {
   if (!xeniCart || !xeniCart.cart_items) {
     return createEmptyCart();
   }
 
-  const lines: CartLine[] = xeniCart.cart_items.map((item: any) => {
+  const cartId = xeniCart.id || "temp";
+
+  const lines: CartLine[] = xeniCart.cart_items.map((item) => {
     const product = item.product;
     const variant = item.variant;
     
@@ -381,7 +419,7 @@ function mapXeniCartToEpic(xeniCart: any): Cart {
       tags: [], // Xeni doesn't have tags, use empty array
       variant: variant ? {
         id: variant.id,
-        sku: variant.sku,
+        sku: variant.sku || "",
         color: variant.color,
         size: variant.size,
         priceModifier: variant.price_modifier,
@@ -391,7 +429,7 @@ function mapXeniCartToEpic(xeniCart: any): Cart {
     };
 
     return {
-      id: item.id,
+      id: item.id || `${item.product_id}-${item.variant_id || 'default'}`,
       product: epicProduct,
       quantity: item.quantity,
       lineTotal: xeniPriceToMoney(finalPrice * item.quantity),
@@ -402,7 +440,7 @@ function mapXeniCartToEpic(xeniCart: any): Cart {
   const subtotal = lines.reduce((total, line) => total + line.lineTotal.amount, 0);
 
   return {
-    id: xeniCart.id,
+    id: cartId,
     lines,
     subtotal: { amount: subtotal, currency: "BDT" },
     currency: "BDT",
@@ -706,7 +744,7 @@ export const xeniProvider: CommerceProvider = {
         return createEmptyCart();
       }
       
-      const data = await response.json();
+      const data: XeniCart = await response.json();
       // Map Xeni cart response to E-Pic cart format
       return mapXeniCartToEpic(data);
     } catch (error) {
@@ -728,7 +766,7 @@ export const xeniProvider: CommerceProvider = {
   async addToCart(productId: string, quantity: number, variantId?: string): Promise<Cart> {
     // Uses server-side API route
     const sessionId = ensureSessionId();
-    const body: any = { product_id: productId, quantity };
+    const body: { product_id: string; quantity: number; variant_id?: string } = { product_id: productId, quantity };
     if (variantId) {
       body.variant_id = variantId;
     }

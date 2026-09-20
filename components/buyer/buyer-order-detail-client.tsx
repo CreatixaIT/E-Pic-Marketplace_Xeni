@@ -10,7 +10,13 @@ type Order = {
   customer_name?: string;
   customer_phone?: string;
   customer_address?: string;
-  order_items: any[];
+  order_items: Array<{
+    id: string;
+    product_id: string;
+    variant_id?: string;
+    quantity: number;
+    price: number;
+  }>;
   total_amount: number;
   payment_status: string;
   delivery_status: string;
@@ -19,29 +25,33 @@ type Order = {
   created_at: string;
 };
 
-export function BuyerOrderDetailClient({ orderId, userId }: { orderId: string; userId: string }) {
+export function BuyerOrderDetailClient({ orderId }: { orderId: string }) {
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchOrder();
-  }, [orderId]);
+    let isMounted = true;
+    const fetchOrder = async () => {
+      try {
+        const response = await fetch(`/api/orders/${orderId}`);
 
-  const fetchOrder = async () => {
-    try {
-      const response = await fetch(`/api/orders/${orderId}`);
-
-      if (response.ok) {
-        const data = await response.json();
-        setOrder(data.data);
+        if (response.ok && isMounted) {
+          const data = await response.json();
+          setOrder(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch order:", error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      console.error("Failed to fetch order:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchOrder();
+    return () => { isMounted = false; };
+  }, [orderId]);
 
   if (loading) {
     return (
@@ -96,7 +106,7 @@ export function BuyerOrderDetailClient({ orderId, userId }: { orderId: string; u
       <div className="border rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Order Items</h2>
         <div className="space-y-2">
-          {order.order_items.map((item: any, index: number) => (
+          {order.order_items.map((item, index: number) => (
             <div key={index} className="flex justify-between p-3 border rounded">
               <div>
                 <p className="font-medium">Product ID: {item.product_id}</p>

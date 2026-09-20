@@ -42,11 +42,6 @@ export function EditProductClient({ productId, userId }: { productId: string; us
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string>("");
 
-  useEffect(() => {
-    fetchProduct();
-    fetchCategories();
-  }, [productId]);
-
   const fetchCategories = async () => {
     try {
       const response = await fetch("/api/categories");
@@ -58,10 +53,6 @@ export function EditProductClient({ productId, userId }: { productId: string; us
       console.error("Failed to fetch categories:", error);
     }
   };
-
-  useEffect(() => {
-    fetchProduct();
-  }, [productId]);
 
   const fetchProduct = async () => {
     try {
@@ -88,6 +79,15 @@ export function EditProductClient({ productId, userId }: { productId: string; us
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const loadData = async () => {
+      await Promise.all([fetchProduct(), fetchCategories()]);
+    };
+
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productId]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

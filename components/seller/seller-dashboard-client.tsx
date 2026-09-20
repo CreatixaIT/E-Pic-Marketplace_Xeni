@@ -29,46 +29,47 @@ export function SellerDashboardClient({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+    const fetchShopData = async () => {
+      try {
+        const response = await fetch("/api/shops/me");
+
+        if (response.ok && isMounted) {
+          const data = await response.json();
+          setShop(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch shop data:", error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    const fetchStats = async () => {
+      try {
+        const productsResponse = await fetch("/api/products");
+        const ordersResponse = await fetch("/api/orders");
+
+        if (productsResponse.ok && isMounted) {
+          const productsData = await productsResponse.json();
+          setStats((prev) => ({ ...prev, totalProducts: productsData.data?.length || 0 }));
+        }
+
+        if (ordersResponse.ok && isMounted) {
+          const ordersData = await ordersResponse.json();
+          setStats((prev) => ({ ...prev, totalOrders: ordersData.data?.length || 0 }));
+        }
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
+      }
+    };
+
     fetchShopData();
     fetchStats();
+    return () => { isMounted = false; };
   }, [userId]);
-
-  const fetchShopData = async () => {
-    try {
-      const response = await fetch("/api/shops/me");
-
-      if (response.ok) {
-        const data = await response.json();
-        setShop(data.data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch shop data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchStats = async () => {
-    try {
-      // Fetch products count
-      const productsResponse = await fetch("/api/products");
-
-      // Fetch orders count
-      const ordersResponse = await fetch("/api/orders");
-
-      if (productsResponse.ok) {
-        const productsData = await productsResponse.json();
-        setStats((prev) => ({ ...prev, totalProducts: productsData.data?.length || 0 }));
-      }
-
-      if (ordersResponse.ok) {
-        const ordersData = await ordersResponse.json();
-        setStats((prev) => ({ ...prev, totalOrders: ordersData.data?.length || 0 }));
-      }
-    } catch (error) {
-      console.error("Failed to fetch stats:", error);
-    }
-  };
 
   const handleLogout = async () => {
     try {

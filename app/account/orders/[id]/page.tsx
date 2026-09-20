@@ -19,5 +19,5 @@ export default async function BuyerOrderDetailPage({
     redirect("/login");
   }
 
-  return <BuyerOrderDetailClient orderId={params.id} userId={session.user.id} />;
+  return <BuyerOrderDetailClient orderId={params.id} />;
 }

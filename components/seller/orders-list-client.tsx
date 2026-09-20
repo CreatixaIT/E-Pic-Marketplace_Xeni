@@ -21,23 +21,27 @@ export function OrdersListClient({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchOrders();
-  }, [userId]);
+    let isMounted = true;
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch("/api/orders");
 
-  const fetchOrders = async () => {
-    try {
-      const response = await fetch("/api/orders");
-
-      if (response.ok) {
-        const data = await response.json();
-        setOrders(data.data || []);
+        if (response.ok && isMounted) {
+          const data = await response.json();
+          setOrders(data.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      console.error("Failed to fetch orders:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchOrders();
+    return () => { isMounted = false; };
+  }, [userId]);
 
   const handleViewOrder = (orderId: string) => {
     router.push(`/seller/orders/${orderId}`);

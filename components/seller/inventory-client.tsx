@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Plus, Minus, ArrowUp, ArrowDown, History } from "lucide-react";
+import { Minus, ArrowUp, ArrowDown, History } from "lucide-react";
 
 type Product = {
   id: string;
@@ -24,8 +23,7 @@ type InventoryLog = {
   created_at: string;
 };
 
-export function InventoryClient({ userId }: { userId: string }) {
-  const router = useRouter();
+export function InventoryClient() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [inventoryLogs, setInventoryLogs] = useState<InventoryLog[]>([]);
@@ -35,23 +33,27 @@ export function InventoryClient({ userId }: { userId: string }) {
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
-    fetchProducts();
-  }, [userId]);
+    let isMounted = true;
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/products");
 
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch("/api/products");
-
-      if (response.ok) {
-        const data = await response.json();
-        setProducts(data.data || []);
+        if (response.ok && isMounted) {
+          const data = await response.json();
+          setProducts(data.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchProducts();
+    return () => { isMounted = false; };
+  }, []);
 
   const fetchInventoryHistory = async (productId: string) => {
     try {
@@ -92,7 +94,16 @@ export function InventoryClient({ userId }: { userId: string }) {
       );
 
       if (response.ok) {
-        await fetchProducts();
+        // Re-fetch products
+        try {
+          const productsResponse = await fetch("/api/products");
+          if (productsResponse.ok) {
+            const productsData = await productsResponse.json();
+            setProducts(productsData.data || []);
+          }
+        } catch (error) {
+          console.error("Failed to re-fetch products:", error);
+        }
         await fetchInventoryHistory(selectedProduct.id);
         setQuantity("0");
         setNotes("");

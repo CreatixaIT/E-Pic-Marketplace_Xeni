@@ -7,6 +7,7 @@ import { getCommerceProvider } from "@/lib/commerce";
 import { getPreferences } from "@/lib/preferences/server";
 import { SearchBar } from "@/components/search/search-bar";
 import { CategoryFilter } from "@/components/search/category-filter";
+import type { CategoryId } from "@/lib/commerce/types";
 
 export const metadata: Metadata = {
   title: "Explore E-Pic Marketplace",
@@ -24,7 +25,7 @@ export default async function ExplorePage({
 
   const [stores, products, categories, { locale, dictionary }] = await Promise.all([
     commerce.getStores(),
-    category ? commerce.getProductsByCategory(category as any) : commerce.getProducts(),
+    category ? commerce.getProductsByCategory(category as CategoryId) : commerce.getProducts(),
     commerce.getCategories(),
     getPreferences(),
   ]);

@@ -10,7 +10,13 @@ type Order = {
   customer_name?: string;
   customer_phone?: string;
   customer_address?: string;
-  order_items: any[];
+  order_items: Array<{
+    id: string;
+    product_id: string;
+    variant_id?: string;
+    quantity: number;
+    price: number;
+  }>;
   total_amount: number;
   payment_status: string;
   delivery_status: string;
@@ -19,15 +25,11 @@ type Order = {
   created_at: string;
 };
 
-export function OrderDetailClient({ orderId, userId }: { orderId: string; userId: string }) {
+export function OrderDetailClient({ orderId }: { orderId: string }) {
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-
-  useEffect(() => {
-    fetchOrder();
-  }, [orderId]);
 
   const fetchOrder = async () => {
     try {
@@ -43,6 +45,15 @@ export function OrderDetailClient({ orderId, userId }: { orderId: string; userId
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const loadOrder = async () => {
+      await fetchOrder();
+    };
+
+    loadOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId]);
 
   const handleUpdatePaymentStatus = async (status: string) => {
     setUpdating(true);
@@ -123,7 +134,7 @@ export function OrderDetailClient({ orderId, userId }: { orderId: string; userId
       <div className="border rounded-lg p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Order Items</h2>
         <div className="space-y-2">
-          {order.order_items.map((item: any, index: number) => (
+          {order.order_items.map((item, index: number) => (
             <div key={index} className="flex justify-between p-3 border rounded">
               <div>
                 <p className="font-medium">Product ID: {item.product_id}</p>

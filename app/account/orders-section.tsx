@@ -22,27 +22,31 @@ export function OrdersSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    let isMounted = true;
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch("/api/orders", {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-  const fetchOrders = async () => {
-    try {
-      const response = await fetch("/api/orders", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setOrders(data.data || []);
+        if (response.ok && isMounted) {
+          const data = await response.json();
+          setOrders(data.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      console.error("Failed to fetch orders:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchOrders();
+    return () => { isMounted = false; };
+  }, []);
 
   if (loading) {
     return (

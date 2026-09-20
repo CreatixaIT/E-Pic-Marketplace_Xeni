@@ -22,23 +22,27 @@ export function ProductsListClient({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProducts();
-  }, [userId]);
+    let isMounted = true;
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/products");
 
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch("/api/products");
-
-      if (response.ok) {
-        const data = await response.json();
-        setProducts(data.data || []);
+        if (response.ok && isMounted) {
+          const data = await response.json();
+          setProducts(data.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchProducts();
+    return () => { isMounted = false; };
+  }, [userId]);
 
   const handleDelete = async (productId: string) => {
     if (!confirm("Are you sure you want to delete this product?")) {

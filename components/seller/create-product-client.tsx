@@ -27,10 +27,6 @@ export function CreateProductClient({ userId }: { userId: string }) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string>("");
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
   const fetchCategories = async () => {
     try {
       const response = await fetch("/api/categories");
@@ -42,6 +38,11 @@ export function CreateProductClient({ userId }: { userId: string }) {
       console.error("Failed to fetch categories:", error);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
+    fetchCategories();
+  }, []);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

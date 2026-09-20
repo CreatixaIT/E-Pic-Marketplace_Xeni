@@ -18,5 +18,5 @@ export default async function CheckoutPage() {
 
   const { dictionary } = await getPreferences();
 
-  return <CheckoutClient userId={session.user.id} dictionary={dictionary} />;
+  return <CheckoutClient dictionary={dictionary} />;
 }

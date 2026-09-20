@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/section";
@@ -11,11 +11,17 @@ import type { Dictionary } from "@/lib/i18n/types";
 
 type CartItem = {
   productId: string;
-  product: any;
+  product: {
+    id: string;
+    name: string;
+    nameBn?: string;
+    price: number;
+    storeName: string;
+  };
   quantity: number;
 };
 
-export function CheckoutClient({ userId, dictionary }: { userId: string; dictionary: Dictionary }) {
+export function CheckoutClient({ dictionary }: { dictionary: Dictionary }) {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
