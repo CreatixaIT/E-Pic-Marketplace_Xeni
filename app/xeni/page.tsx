@@ -8,7 +8,10 @@ export const metadata: Metadata = {
 
 export default async function XeniPage() {
   // Redirect to the configured Xeni URL
-  // This allows the Xeni domain to be configurable via environment variable
-  const xeniUrl = process.env.NEXT_PUBLIC_XENI_URL || "https://xeni.xentroinfotech.com";
+  // NEXT_PUBLIC_XENI_URL must be set in environment variables
+  const xeniUrl = process.env.NEXT_PUBLIC_XENI_URL;
+  if (!xeniUrl) {
+    throw new Error("NEXT_PUBLIC_XENI_URL environment variable is not configured. Please set this variable to your Xeni seller dashboard URL.");
+  }
   redirect(xeniUrl);
 }
