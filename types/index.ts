@@ -10,6 +10,7 @@ export type Route =
   | "/stores"
   | "/cart"
   | "/seller"
+  | "/xeni"
   | "/about"
   | `/stores/${string}`;
 

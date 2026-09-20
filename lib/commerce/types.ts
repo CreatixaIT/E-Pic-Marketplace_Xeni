@@ -11,7 +11,7 @@ import type { Route } from "@/types";
 export type Money = {
   /** Minor units, e.g. cents. Avoids float rounding issues. */
   amount: number;
-  currency: "USD" | "EUR" | "GBP";
+  currency: "USD" | "EUR" | "GBP" | "BDT";
 };
 
 export type Image = {
