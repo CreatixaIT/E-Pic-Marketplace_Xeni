@@ -46,7 +46,7 @@ export function SiteFooter({
         </div>
 
         <p className="mt-12 border-t border-border pt-6 text-xs text-muted">
-          © {new Date().getFullYear()} {siteConfig.name}. {footer.note}
+          © {new Date().getFullYear()} {siteConfig.name} — Powered by Xeni. {footer.note}
         </p>
       </Container>
     </footer>
