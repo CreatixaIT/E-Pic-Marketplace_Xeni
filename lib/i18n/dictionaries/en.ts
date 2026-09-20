@@ -66,7 +66,7 @@ export const en: Dictionary = {
   footer: {
     marketplace: "Marketplace",
     sellers: "Sellers",
-    note: "Preview build — commerce operations arrive with Xeni.",
+    note: "E-Pic — Powered by Xeni",
   },
   badges: {
     new: "New",

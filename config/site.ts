@@ -1,11 +1,11 @@
 import type { FooterNavGroup, NavLink } from "@/types";
 
 export const siteConfig = {
-  name: "E-pic",
+  name: "E-Pic",
   tagline: "Discover brands. Enter their worlds. Shop differently.",
   description:
-    "E-pic is a premium marketplace where every brand gets its own immersive storefront. Discover independent makers, step inside their worlds, and shop differently.",
-  url: "https://epic.example.com",
+    "E-Pic is a premium marketplace where every brand gets its own immersive storefront. Discover independent makers, step inside their worlds, and shop differently.",
+  url: "https://e-pic.co",
 } as const;
 
 export const mainNav: NavLink[] = [
@@ -27,7 +27,7 @@ export const footerNav: FooterNavGroup[] = [
   {
     titleKey: "sellers",
     links: [
-      { labelKey: "openStore", href: "/seller" },
+      { labelKey: "openStore", href: "/xeni" },
       { labelKey: "about", href: "/about" },
     ],
   },

@@ -14,7 +14,7 @@ export default function RegisterPage() {
   const { data: session } = useSession();
   const dict = useDictionary();
   const [formData, setFormData] = useState({
-    name: "",
+    full_name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -75,7 +75,7 @@ export default function RegisterPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: formData.name || undefined,
+          full_name: formData.full_name || undefined,
           email: formData.email,
           password: formData.password,
         }),
@@ -149,14 +149,14 @@ export default function RegisterPage() {
               )}
 
               <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-2">
+                <label htmlFor="full_name" className="block text-sm font-medium mb-2">
                   {dict.auth.name} <span className="text-muted">(optional)</span>
                 </label>
                 <input
-                  id="name"
-                  name="name"
+                  id="full_name"
+                  name="full_name"
                   type="text"
-                  value={formData.name}
+                  value={formData.full_name}
                   onChange={handleChange}
                   placeholder={dict.auth.namePlaceholder}
                   className={cn(

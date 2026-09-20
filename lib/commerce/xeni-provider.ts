@@ -107,11 +107,10 @@ type XeniCategory = {
 // Helper: Convert Xeni price to E-Pic Money format
 function xeniPriceToMoney(price: number): Money {
   // Xeni stores prices as decimal (BDT), convert to minor units (paisa)
-  // For now, we'll treat as USD cents for compatibility
-  // TODO: Add proper currency conversion in future milestone
+  // 1 BDT = 100 paisa
   return {
     amount: Math.round(price * 100),
-    currency: "USD",
+    currency: "BDT",
   };
 }
 
@@ -317,8 +316,8 @@ function createEmptyCart(): Cart {
   return {
     id: "cart-empty",
     lines: [],
-    subtotal: { amount: 0, currency: "USD" },
-    currency: "USD",
+    subtotal: { amount: 0, currency: "BDT" },
+    currency: "BDT",
   };
 }
 

@@ -31,7 +31,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   // Derive currency from cart items (all items should have same currency in single-store cart)
-  const currency = cart.items.length > 0 ? cart.items[0].product.price.currency : "USD";
+  const currency = cart.items.length > 0 ? cart.items[0].product.price.currency : "BDT";
 
   const addItem = async (product: Product, quantity: number): Promise<boolean> => {
     // Check if this would be a cross-store checkout

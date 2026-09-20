@@ -66,7 +66,7 @@ export const bn: Dictionary = {
   footer: {
     marketplace: "মার্কেটপ্লেস",
     sellers: "বিক্রেতা",
-    note: "প্রিভিউ সংস্করণ — কমার্স কার্যক্রম আসবে Xeni-র সঙ্গে।",
+    note: "E-Pic — Powered by Xeni",
   },
   badges: {
     new: "নতুন",
