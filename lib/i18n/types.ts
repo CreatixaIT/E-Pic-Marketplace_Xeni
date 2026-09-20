@@ -218,6 +218,20 @@ export type Dictionary = {
     requiredField: string;
     backToHome: string;
     verificationError: string;
+    forgotPassword: string;
+    forgotPasswordDescription: string;
+    resetPassword: string;
+    resetPasswordDescription: string;
+    sendResetCode: string;
+    sending: string;
+    resetCode: string;
+    resendCode: string;
+    newPassword: string;
+    resetEmailSent: string;
+    passwordResetSuccess: string;
+    resetting: string;
+    resetCodeResent: string;
+    backToLogin: string;
   };
   account: {
     myAccount: string;

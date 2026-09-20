@@ -181,6 +181,15 @@ export default function LoginPage() {
               {isLoading ? dict.auth.signingIn : dict.auth.signIn}
             </Button>
 
+            <div className="text-center">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-accent hover:underline"
+              >
+                {dict.auth.forgotPassword || "Forgot Password?"}
+              </Link>
+            </div>
+
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-border"></div>
