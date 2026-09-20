@@ -9,5 +9,6 @@ export const metadata: Metadata = {
 export default async function SellerDashboardPage() {
   // Redirect all seller dashboard requests to Xeni
   // Sellers should manage their business through Xeni's dashboard
-  redirect("https://xeni.xentroinfotech.com/en/dashboard");
+  const xeniUrl = process.env.NEXT_PUBLIC_XENI_URL || "https://xeni.xentroinfotech.com";
+  redirect(`${xeniUrl}/en/dashboard`);
 }

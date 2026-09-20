@@ -7,5 +7,6 @@ export const metadata: Metadata = {
 };
 
 export default async function EditProductPage() {
-  redirect("https://xeni.xentroinfotech.com/en/dashboard/products");
+  const xeniUrl = process.env.NEXT_PUBLIC_XENI_URL || "https://xeni.xentroinfotech.com";
+  redirect(`${xeniUrl}/en/dashboard/products`);
 }
