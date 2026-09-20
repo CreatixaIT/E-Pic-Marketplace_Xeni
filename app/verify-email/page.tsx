@@ -25,6 +25,7 @@ export default function VerifyEmailPage() {
   const [isResending, setIsResending] = useState(false);
   const [success, setSuccess] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -101,8 +102,14 @@ export default function VerifyEmailPage() {
       return;
     }
 
+    if (resendCooldown > 0) {
+      setErrors({ form: `Please wait ${resendCooldown} seconds before requesting another OTP` });
+      return;
+    }
+
     setIsResending(true);
     setResendSuccess(false);
+    setErrors({});
 
     try {
       const response = await fetch(`${GATEWAY_AUTH_API_BASE_URL}/resend-otp`, {
@@ -118,14 +125,31 @@ export default function VerifyEmailPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setErrors({ form: data.error || "Failed to resend OTP" });
+        if (response.status === 429) {
+          setErrors({ form: "Too many resend attempts. Please wait before trying again." });
+        } else {
+          setErrors({ form: data.error || "Failed to resend OTP" });
+        }
         return;
       }
 
       setResendSuccess(true);
+      setResendCooldown(60); // 60 second cooldown
+      
+      // Countdown timer
+      const timer = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
       setTimeout(() => setResendSuccess(false), 5000);
     } catch {
-      setErrors({ form: "Failed to resend OTP" });
+      setErrors({ form: "Failed to resend OTP. Please check your connection." });
     } finally {
       setIsResending(false);
     }
@@ -133,7 +157,15 @@ export default function VerifyEmailPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // For OTP code, only allow digits
+    if (name === "code") {
+      const digitsOnly = value.replace(/\D/g, "").slice(0, 6);
+      setFormData((prev) => ({ ...prev, [name]: digitsOnly }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+    
     // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors((prev) => {
@@ -209,6 +241,8 @@ export default function VerifyEmailPage() {
                   id="code"
                   name="code"
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={formData.code}
                   onChange={handleChange}
                   placeholder="123456"
@@ -240,10 +274,14 @@ export default function VerifyEmailPage() {
                 <button
                   type="button"
                   onClick={handleResend}
-                  disabled={isResending}
+                  disabled={isResending || resendCooldown > 0}
                   className="text-sm text-accent hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isResending ? "Sending..." : "Resend OTP"}
+                  {isResending 
+                    ? "Sending..." 
+                    : resendCooldown > 0 
+                      ? `Resend OTP (${resendCooldown}s)` 
+                      : "Resend OTP"}
                 </button>
               </div>
 

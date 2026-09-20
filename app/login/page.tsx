@@ -8,6 +8,7 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { useDictionary } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
+import { Eye, EyeOff } from "lucide-react";
 
 const GATEWAY_AUTH_API_BASE_URL = process.env.NEXT_PUBLIC_XENI_AUTH_API_BASE_URL || "http://localhost:8080/api/auth";
 
@@ -24,6 +25,7 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [verificationRequired, setVerificationRequired] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -101,6 +103,10 @@ export default function LoginPage() {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
       <Container>
@@ -154,20 +160,30 @@ export default function LoginPage() {
               <label htmlFor="password" className="block text-sm font-medium mb-2">
                 {dict.auth.password} <span className="text-red-500">*</span>
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder={dict.auth.passwordPlaceholder}
-                className={cn(
-                  "w-full px-4 py-3 rounded-lg border bg-background",
-                  "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
-                  "transition-colors",
-                  errors.password && "border-red-500"
-                )}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder={dict.auth.passwordPlaceholder}
+                  className={cn(
+                    "w-full px-4 py-3 rounded-lg border bg-background pr-12",
+                    "focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
+                    "transition-colors",
+                    errors.password && "border-red-500"
+                  )}
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  aria-label={showPassword ? dict.auth.hidePassword : dict.auth.showPassword}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
               {errors.password && (
                 <p className="mt-1 text-sm text-red-500">{errors.password}</p>
               )}
