@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { CheckoutClient } from "@/components/checkout/checkout-client";
+import { getPreferences } from "@/lib/preferences/server";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -15,5 +16,7 @@ export default async function CheckoutPage() {
     redirect("/login");
   }
 
-  return <CheckoutClient userId={session.user.id} />;
+  const { dictionary } = await getPreferences();
+
+  return <CheckoutClient userId={session.user.id} dictionary={dictionary} />;
 }

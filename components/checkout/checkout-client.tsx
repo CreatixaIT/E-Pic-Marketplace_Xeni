@@ -7,6 +7,7 @@ import { Section } from "@/components/ui/section";
 import { Container } from "@/components/ui/container";
 import { ShoppingCart, ArrowLeft, Check } from "lucide-react";
 import { useCart } from "@/lib/cart/provider";
+import type { Dictionary } from "@/lib/i18n/types";
 
 type CartItem = {
   productId: string;
@@ -14,7 +15,7 @@ type CartItem = {
   quantity: number;
 };
 
-export function CheckoutClient({ userId }: { userId: string }) {
+export function CheckoutClient({ userId, dictionary }: { userId: string; dictionary: Dictionary }) {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
@@ -27,12 +28,12 @@ export function CheckoutClient({ userId }: { userId: string }) {
 
   const handleCheckout = async () => {
     if (!customerName || !customerPhone || !customerAddress) {
-      alert("Please fill in all customer details");
+      alert(dictionary.checkout.customerDetails.requiredField || "Please fill in all customer details");
       return;
     }
 
     if (items.length === 0) {
-      alert("Your cart is empty");
+      alert(dictionary.cart.empty || "Your cart is empty");
       return;
     }
 
@@ -58,11 +59,11 @@ export function CheckoutClient({ userId }: { userId: string }) {
         clearCart();
       } else {
         const error = await response.json();
-        alert(error.error || "Checkout failed");
+        alert(error.error || dictionary.checkout.emptyCartDescription || "Checkout failed");
       }
     } catch (error) {
       console.error("Checkout failed:", error);
-      alert("Checkout failed. Please try again.");
+      alert(dictionary.checkout.emptyCartDescription || "Checkout failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -78,15 +79,15 @@ export function CheckoutClient({ userId }: { userId: string }) {
                 <Check className="h-8 w-8 text-green-600" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold mb-4">Order Placed Successfully!</h2>
-            <p className="text-muted mb-2">Your order has been placed successfully.</p>
-            <p className="text-sm text-muted mb-6">Order ID: {orderId.slice(0, 8)}...</p>
+            <h2 className="text-2xl font-bold mb-4">{dictionary.checkout.orderReview.thankYou || "Order Placed Successfully!"}</h2>
+            <p className="text-muted mb-2">{dictionary.checkout.orderReview.description || "Your order has been placed successfully."}</p>
+            <p className="text-sm text-muted mb-6">{dictionary.checkout.orderReview.orderNumber || "Order ID"}: {orderId.slice(0, 8)}...</p>
             <div className="space-y-3">
               <Button onClick={() => router.push("/account/orders")} className="w-full">
-                View My Orders
+                {dictionary.checkout.orderReview.viewOrder || "View My Orders"}
               </Button>
               <Button variant="secondary" onClick={() => router.push("/")} className="w-full">
-                Continue Shopping
+                {dictionary.checkout.orderReview.continueShopping || "Continue Shopping"}
               </Button>
             </div>
           </div>
@@ -100,26 +101,26 @@ export function CheckoutClient({ userId }: { userId: string }) {
       <Section>
         <Button variant="secondary" onClick={() => router.back()} className="mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Cart
+          {dictionary.cart.keepShopping || "Back to Cart"}
         </Button>
 
         <div className="grid md:grid-cols-2 gap-6">
           <div className="border rounded-3xl p-6">
-            <h2 className="text-xl font-semibold mb-4">Customer Information</h2>
+            <h2 className="text-xl font-semibold mb-4">{dictionary.checkout.customerDetails.title || "Customer Information"}</h2>
             <div className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-2">Full Name</label>
+                <label htmlFor="name" className="block text-sm font-medium mb-2">{dictionary.checkout.customerDetails.fullName}</label>
                 <input
                   id="name"
                   type="text"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="Enter your full name"
+                  placeholder={dictionary.checkout.customerDetails.fullNamePlaceholder}
                   className="w-full p-3 border rounded-lg"
                 />
               </div>
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium mb-2">Phone Number</label>
+                <label htmlFor="phone" className="block text-sm font-medium mb-2">{dictionary.checkout.customerDetails.phone}</label>
                 <input
                   id="phone"
                   type="text"
@@ -130,18 +131,18 @@ export function CheckoutClient({ userId }: { userId: string }) {
                 />
               </div>
               <div>
-                <label htmlFor="address" className="block text-sm font-medium mb-2">Delivery Address</label>
+                <label htmlFor="address" className="block text-sm font-medium mb-2">{dictionary.checkout.deliveryAddress.addressLine}</label>
                 <input
                   id="address"
                   type="text"
                   value={customerAddress}
                   onChange={(e) => setCustomerAddress(e.target.value)}
-                  placeholder="Enter your delivery address"
+                  placeholder={dictionary.checkout.deliveryAddress.addressLinePlaceholder}
                   className="w-full p-3 border rounded-lg"
                 />
               </div>
               <div>
-                <label htmlFor="payment" className="block text-sm font-medium mb-2">Payment Method</label>
+                <label htmlFor="payment" className="block text-sm font-medium mb-2">{dictionary.checkout.paymentMethod.title}</label>
                 <select
                   id="payment"
                   value={paymentMethod}
@@ -159,32 +160,32 @@ export function CheckoutClient({ userId }: { userId: string }) {
           <div className="border rounded-3xl p-6">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
               <ShoppingCart className="h-5 w-5 mr-2" />
-              Order Summary
+              {dictionary.checkout.orderReview.title || "Order Summary"}
             </h2>
             {items.length === 0 ? (
-              <p className="text-center text-muted py-8">Your cart is empty</p>
+              <p className="text-center text-muted py-8">{dictionary.cart.empty || "Your cart is empty"}</p>
             ) : (
               <div className="space-y-4">
                 {items.map((item) => (
                   <div key={item.productId} className="flex justify-between p-3 border rounded-lg">
                     <div>
                       <p className="font-medium">{item.product.name}</p>
-                      <p className="text-sm text-muted">Qty: {item.quantity}</p>
+                      <p className="text-sm text-muted">{dictionary.cart.quantity || "Qty"}: {item.quantity}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-medium">
-                        ${(item.product.price.amount * item.quantity).toFixed(2)}
+                        ৳{(item.product.price.amount * item.quantity).toFixed(2)}
                       </p>
                       <p className="text-sm text-muted">
-                        ${item.product.price.amount.toFixed(2)} each
+                        ৳{item.product.price.amount.toFixed(2)} {dictionary.checkout.orderReview.description || "each"}
                       </p>
                     </div>
                   </div>
                 ))}
                 <div className="border-t pt-4">
                   <div className="flex justify-between font-semibold">
-                    <span>Total</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>{dictionary.cart.subtotal || "Total"}</span>
+                    <span>৳{subtotal.toFixed(2)}</span>
                   </div>
                 </div>
                 <Button
@@ -192,7 +193,7 @@ export function CheckoutClient({ userId }: { userId: string }) {
                   disabled={loading || items.length === 0}
                   className="w-full"
                 >
-                  {loading ? "Processing..." : "Place Order"}
+                  {loading ? (dictionary.checkout.customerDetails.continue || "Processing...") : (dictionary.cart.checkout || "Place Order")}
                 </Button>
               </div>
             )}

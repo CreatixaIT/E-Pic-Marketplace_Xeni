@@ -120,6 +120,7 @@ export type Dictionary = {
       emailPlaceholder: string;
       emailExplanation: string;
       continue: string;
+      requiredField: string;
     };
     deliveryAddress: {
       title: string;
@@ -157,7 +158,14 @@ export type Dictionary = {
     };
     orderReview: {
       title: string;
+      thankYou: string;
       description: string;
+      orderNumber: string;
+      orderNumberPlaceholder: string;
+      whatHappensNext: string;
+      whatHappensNextDescription: string;
+      continueShopping: string;
+      viewOrder: string;
       customerDetails: string;
       deliveryAddress: string;
       paymentMethod: string;
@@ -170,8 +178,8 @@ export type Dictionary = {
       taxesPlaceholder: string;
       total: string;
       edit: string;
-      placeOrder: string;
       demoNotice: string;
+      placeOrder: string;
     };
     confirmation: {
       title: string;
@@ -185,7 +193,7 @@ export type Dictionary = {
       continueShopping: string;
       viewOrder: string;
     };
-  };
+  },
   auth: {
     login: string;
     register: string;
